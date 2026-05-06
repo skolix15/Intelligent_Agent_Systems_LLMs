@@ -13,7 +13,7 @@ load_dotenv()
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Multi-Agent Software Engineering Benchmark")
-    parser.add_argument("--benchmark",      type=str,   default="data/humaneval.jsonl")
+    parser.add_argument("--benchmark",      type=str,   default="data/HumanEval.jsonl")
     parser.add_argument("--max-problems",   type=int,   default=10)
     parser.add_argument("--max-iterations", type=int,   default=5)
     parser.add_argument("--pass-threshold", type=float, default=1.0)
