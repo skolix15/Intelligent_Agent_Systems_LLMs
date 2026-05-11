@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi-Agent LLM System — Developer Guide</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0d1117;
+      --surface:  #161b22;
+      --border:   #21262d;
+      --border2:  #30363d;
+      --text:     #e6edf3;
+      --muted:    #7d8590;
+      --accent:   #58a6ff;
+      --green:    #3fb950;
+      --yellow:   #d29922;
+      --purple:   #bc8cff;
+      --orange:   #f0883e;
+      --red:      #f85149;
+      --nav-h:    56px;
+      --tab-h:    48px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── HEADER ── */
+    header {
+      flex-shrink: 0;
+      height: var(--nav-h);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 28px;
+      gap: 16px;
+    }
+    .brand-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+    header h1 { font-size: .95rem; font-weight: 700; color: var(--text); white-space: nowrap; }
+    header p  { font-size: .78rem; color: var(--muted); margin-left: 4px; }
+
+    /* ── TAB BAR ── */
+    .tab-bar {
+      flex-shrink: 0;
+      height: var(--tab-h);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-end;
+      padding: 0 20px;
+      gap: 2px;
+      overflow-x: auto;
+    }
+    .tab-bar::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      flex-shrink: 0;
+      padding: 0 18px;
+      height: 38px;
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid transparent;
+      border-bottom: none;
+      border-radius: 6px 6px 0 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: color .15s, background .15s;
+      position: relative;
+      bottom: -1px;
+    }
+    .tab-btn:hover { color: var(--text); background: var(--surface); }
+    .tab-btn.active {
+      color: var(--text);
+      background: var(--surface);
+      border-color: var(--border);
+      border-bottom-color: var(--surface);
+    }
+    .tab-btn .ti { font-size: .9rem; }
+
+    /* ── CONTENT AREA ── */
+    .tab-content { flex: 1; overflow: hidden; position: relative; }
+    .tab-panel {
+      display: none;
+      position: absolute; inset: 0;
+      overflow-y: auto;
+      padding: 40px 0;
+    }
+    .tab-panel.active { display: block; }
+    .tab-panel::-webkit-scrollbar { width: 6px; }
+    .tab-panel::-webkit-scrollbar-track { background: transparent; }
+    .tab-panel::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+    .inner { max-width: 900px; margin: 0 auto; padding: 0 36px; }
+
+    /* ── TYPOGRAPHY ── */
+    .section-label {
+      font-size: .68rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
+    }
+    h2 { font-size: 1.3rem; font-weight: 700; color: var(--text); margin: 40px 0 10px; }
+    h2:first-child { margin-top: 0; }
+    h3 { font-size: .97rem; font-weight: 600; color: var(--text); margin: 30px 0 8px; }
+    h3:first-child { margin-top: 0; }
+    h4 { font-size: .88rem; font-weight: 700; color: var(--text); margin: 18px 0 6px; }
+    p  { color: var(--muted); margin-bottom: 12px; font-size: .875rem; }
+    p:last-child { margin-bottom: 0; }
+    strong { color: var(--text); font-weight: 600; }
+    ul, ol { padding-left: 20px; color: var(--muted); font-size: .875rem; }
+    li { margin-bottom: 5px; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+
+    /* ── CODE ── */
+    pre {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-family: "SF Mono","Fira Code","Cascadia Code",monospace;
+      font-size: .78rem;
+      line-height: 1.9;
+      color: #a5d6ff;
+      overflow-x: auto;
+      margin: 12px 0;
+      white-space: pre;
+    }
+    code {
+      font-family: "SF Mono","Fira Code",monospace;
+      font-size: .78rem;
+      background: var(--surface);
+      color: #a5d6ff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+    pre code { background: none; border: none; padding: 0; font-size: inherit; }
+    .kw  { color: #ff7b72; }
+    .fn  { color: #d2a8ff; }
+    .cls { color: #79c0ff; }
+    .str { color: #a5d6ff; }
+    .cmt { color: #6e7681; font-style: italic; }
+    .num { color: #f2cc60; }
+
+    /* ── HERO STATS ── */
+    .hero-stats {
+      display: flex; gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+    .stat { flex: 1; padding: 18px 16px; border-right: 1px solid var(--border); text-align: center; }
+    .stat:last-child { border-right: none; }
+    .stat-val { font-size: 1.4rem; font-weight: 800; color: var(--accent); display: block; }
+    .stat-lbl { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-top: 3px; display: block; }
+
+    /* ── PIPELINE DIAGRAM ── */
+    .pipeline {
+      display: flex; align-items: center; gap: 4px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px 28px;
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+    .pipe-node { display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 88px; }
+    .pipe-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; border: 1px solid var(--border2);
+    }
+    .pipe-label { font-size: .72rem; font-weight: 600; color: var(--text); }
+    .pipe-desc  { font-size: .63rem; color: var(--muted); text-align: center; max-width: 82px; }
+    .pipe-arrow { color: var(--border2); font-size: 1.1rem; padding: 0 2px; margin-bottom: 24px; flex-shrink: 0; }
+    .pipe-loop  { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; padding: 0 6px; margin-bottom: 24px; }
+    .pipe-loop-line { font-size: .62rem; font-weight: 700; color: var(--yellow); background: rgba(210,153,34,.1); border: 1px solid rgba(210,153,34,.25); border-radius: 4px; padding: 2px 6px; }
+    .pipe-loop-arrow { font-size: .85rem; color: var(--yellow); }
+    .pipe-icon.pi-start  { background: rgba(88,166,255,.1);  border-color: rgba(88,166,255,.3); }
+    .pipe-icon.pi-plan   { background: rgba(188,140,255,.1); border-color: rgba(188,140,255,.3); }
+    .pipe-icon.pi-code   { background: rgba(63,185,80,.1);   border-color: rgba(63,185,80,.3); }
+    .pipe-icon.pi-test   { background: rgba(240,136,62,.1);  border-color: rgba(240,136,62,.3); }
+    .pipe-icon.pi-review { background: rgba(210,153,34,.1);  border-color: rgba(210,153,34,.3); }
+    .pipe-icon.pi-end    { background: rgba(63,185,80,.1);   border-color: rgba(63,185,80,.3); }
+
+    /* ── FILE TREE ── */
+    .tree {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 18px 22px;
+      font-family: "SF Mono","Fira Code",monospace; font-size: .78rem;
+      line-height: 2.1; margin: 14px 0; overflow-x: auto;
+    }
+    .tree-dir  { color: var(--accent); font-weight: 600; }
+    .tree-file { color: var(--text); }
+    .tree-new  { color: var(--green); }
+    .tree-dim  { color: #4a5568; }
+
+    /* ── CARDS ── */
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 14px; margin: 14px 0; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 18px; transition: border-color .15s;
+    }
+    .card:hover { border-color: var(--border2); }
+    .card-head  { display: flex; align-items: center; gap: 9px; margin-bottom: 9px; }
+    .card-icon  { font-size: 1.1rem; }
+    .card-title { font-size: .88rem; font-weight: 700; color: var(--text); }
+    .card-file  { font-size: .7rem; color: var(--muted); font-family: monospace; }
+    .card p     { font-size: .8rem; color: var(--muted); line-height: 1.65; margin: 0; }
+
+    /* ── BADGES ── */
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: .63rem; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase; padding: 2px 8px; border-radius: 4px; margin-bottom: 8px;
+    }
+    .badge-llm  { background: rgba(63,185,80,.12);  color: var(--green);  border: 1px solid rgba(63,185,80,.3); }
+    .badge-det  { background: rgba(240,136,62,.12); color: var(--orange); border: 1px solid rgba(240,136,62,.3); }
+    .badge-base { background: rgba(88,166,255,.12); color: var(--accent); border: 1px solid rgba(88,166,255,.3); }
+
+    /* ── TABLE ── */
+    .table-wrap { overflow-x: auto; margin: 14px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+    th {
+      background: var(--surface); color: var(--muted); font-weight: 600;
+      font-size: .68rem; letter-spacing: .07em; text-transform: uppercase;
+      text-align: left; padding: 9px 14px; border: 1px solid var(--border);
+    }
+    td { padding: 9px 14px; border: 1px solid var(--border); color: #c9d1d9; vertical-align: top; }
+    tr:hover td { background: var(--surface); }
+
+    /* ── CALLOUTS ── */
+    .callout {
+      border-radius: 8px; padding: 13px 16px; margin: 14px 0;
+      font-size: .84rem; line-height: 1.7;
+      display: flex; gap: 11px; align-items: flex-start;
+    }
+    .callout-icon { font-size: .95rem; margin-top: 1px; flex-shrink: 0; }
+    .callout-body { flex: 1; }
+    .callout-body strong { display: block; margin-bottom: 2px; font-size: .85rem; }
+    .callout.info { background: rgba(88,166,255,.07);  border: 1px solid rgba(88,166,255,.2);  color: #a5c8f0; }
+    .callout.ok   { background: rgba(63,185,80,.07);   border: 1px solid rgba(63,185,80,.2);   color: #8de09a; }
+    .callout.warn { background: rgba(210,153,34,.07);  border: 1px solid rgba(210,153,34,.2);  color: #e3c068; }
+
+    /* ── STEP LIST ── */
+    .steps { list-style: none; padding: 0; counter-reset: step; }
+    .steps li { counter-increment: step; display: flex; gap: 14px; margin-bottom: 18px; align-items: flex-start; }
+    .step-num {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: rgba(88,166,255,.12); border: 1px solid rgba(88,166,255,.3);
+      color: var(--accent); font-size: .72rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 2px;
+    }
+    .step-num::before { content: counter(step); }
+    .steps li > div { flex: 1; }
+    .steps li > div strong { color: var(--text); display: block; margin-bottom: 3px; font-size: .88rem; }
+    .steps li > div p { font-size: .82rem; color: var(--muted); margin: 0; }
+
+    /* ── RUN CARDS ── */
+    .run-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin: 16px 0; }
+    .run-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+    .run-card-mode { font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+    .run-card pre { margin: 0 0 10px; padding: 9px 12px; font-size: .74rem; }
+    .run-card ul { padding-left: 15px; }
+    .run-card li { font-size: .76rem; color: var(--muted); margin-bottom: 3px; }
+    .mode-smoke  .run-card-mode { color: var(--orange); }
+    .mode-single .run-card-mode { color: var(--accent); }
+    .mode-multi  .run-card-mode { color: var(--green); }
+
+    /* ── CONCEPT CARDS ── */
+    .concept-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 24px; margin: 18px 0;
+    }
+    .concept-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+    .concept-num {
+      width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .95rem; font-weight: 800; flex-shrink: 0;
+    }
+    .cn-1 { background: rgba(88,166,255,.12); color: var(--accent); border: 1px solid rgba(88,166,255,.25); }
+    .cn-2 { background: rgba(63,185,80,.12);  color: var(--green);  border: 1px solid rgba(63,185,80,.25); }
+    .cn-3 { background: rgba(188,140,255,.12);color: var(--purple); border: 1px solid rgba(188,140,255,.25); }
+    .concept-title h3 { margin: 0 0 3px; font-size: 1rem; }
+    .concept-title .en { font-size: .75rem; color: var(--muted); font-weight: 400; }
+    .concept-body { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .concept-col h4 { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; margin: 0 0 8px; }
+    .concept-col.theory h4 { color: var(--muted); }
+    .concept-col.impl  h4 { color: var(--green); }
+    .concept-col p  { font-size: .82rem; color: var(--muted); margin: 0; line-height: 1.65; }
+    .concept-col ul { font-size: .82rem; color: var(--muted); padding-left: 17px; }
+    .concept-col li { margin-bottom: 5px; line-height: 1.5; }
+    .impl-tag {
+      display: inline-block; font-size: .65rem; font-weight: 700;
+      background: rgba(63,185,80,.1); color: var(--green);
+      border: 1px solid rgba(63,185,80,.25); border-radius: 4px;
+      padding: 1px 7px; margin-right: 4px; margin-bottom: 4px;
+    }
+    .summary-row {
+      display: flex; gap: 0;
+      border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-top: 28px;
+    }
+    .summary-cell { flex: 1; padding: 16px; border-right: 1px solid var(--border); text-align: center; }
+    .summary-cell:last-child { border-right: none; }
+    .summary-cell .label { font-size: .68rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 5px; }
+    .summary-cell .value { font-size: .85rem; font-weight: 600; color: var(--text); }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ─────────────────────────────────────────────────────────────── -->
+<header>
+  <span class="brand-dot"></span>
+  <h1>Multi-Agent LLM System</h1>
+  <p>Developer Guide · Project 12</p>
+</header>
+
+<!-- ── TAB BAR ───────────────────────────────────────────────────────────── -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="go('overview',  this)"><span class="ti">&#127968;</span> Overview</button>
+  <button class="tab-btn"        onclick="go('structure', this)"><span class="ti">&#128193;</span> Structure</button>
+  <button class="tab-btn"        onclick="go('pipeline',  this)"><span class="ti">&#9654;</span> Pipeline</button>
+  <button class="tab-btn"        onclick="go('agents',    this)"><span class="ti">&#129302;</span> Agents</button>
+  <button class="tab-btn"        onclick="go('dataflow',  this)"><span class="ti">&#8644;</span> Data Flow</button>
+  <button class="tab-btn"        onclick="go('run',       this)"><span class="ti">&#9654;&#9654;</span> Running It</button>
+  <button class="tab-btn"        onclick="go('concepts',  this)"><span class="ti">&#128214;</span> Concepts</button>
+</div>
+
+<!-- ── TAB CONTENT ────────────────────────────────────────────────────────── -->
+<div class="tab-content">
+
+<!-- ════════════════════════════ OVERVIEW ════════════════════════════════════ -->
+<div id="tab-overview" class="tab-panel active">
+<div class="inner">
+
+  <div class="section-label">Project 12 · Intelligent Agent Systems with LLMs</div>
+  <h2>Multi-Agent Collaborative Code Generation</h2>
+  <p>
+    A <strong>LangGraph-orchestrated system</strong> where four specialised LLM agents collaborate
+    to solve Python programming problems from the HumanEval benchmark, benchmarked against
+    a single-agent baseline.
+  </p>
+
+  <div class="hero-stats">
+    <div class="stat"><span class="stat-val">5</span><span class="stat-lbl">Agents</span></div>
+    <div class="stat"><span class="stat-val">164</span><span class="stat-lbl">HumanEval Problems</span></div>
+    <div class="stat"><span class="stat-val">2</span><span class="stat-lbl">Run Modes</span></div>
+    <div class="stat"><span class="stat-val">LangGraph</span><span class="stat-lbl">Orchestration</span></div>
+  </div>
+
+  <hr />
+
+  <h2>What This System Does</h2>
+  <p>
+    The system takes a Python programming problem and solves it through an iterative, multi-agent
+    feedback loop. A <strong>Planner</strong> devises the strategy. A <strong>Coder</strong> writes the code.
+    A <strong>Tester</strong> runs the official HumanEval checks via pytest. A <strong>Reviewer</strong>
+    either approves the solution or sends it back with specific bug reports — triggering another iteration.
+    A <strong>Reporter</strong> narrates the run and generates an HTML report.
+  </p>
+  <p>
+    A <strong>Single-Agent baseline</strong> runs the same benchmark with one LLM call and no
+    feedback loop, providing a direct performance and cost comparison.
+  </p>
+
+  <hr />
+
+  <h2>Research Question</h2>
+  <p><em>Does a multi-agent feedback loop outperform a single-shot LLM call — and at what cost?</em></p>
+  <ul>
+    <li>On <strong>easy problems</strong>, the single agent often solves them first try — lower token cost.</li>
+    <li>On <strong>harder problems</strong>, the feedback loop catches bugs and iterates toward a correct solution.</li>
+    <li>Metrics (solve rate, pass@1, avg iterations, total tokens) quantify the trade-off.</li>
+  </ul>
+
+  <div class="callout ok" style="margin-top:24px;">
+    <span class="callout-icon">&#10003;</span>
+    <div class="callout-body">
+      <strong>Current Status</strong>
+      All five agents implemented. Smoke and single-agent runs complete.
+      Only the multi-agent benchmark run remains — then full comparison data is available for the report.
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════════════════════ STRUCTURE ═══════════════════════════════════ -->
+<div id="tab-structure" class="tab-panel">
+<div class="inner">
+
+  <div class="section-label">Project Structure</div>
+  <h2>Codebase Layout</h2>
+  <p>All entry points, agents, orchestration graph, utilities, and benchmark loading are cleanly separated into their own packages.</p>
+
+  <div class="tree">
+<span class="tree-dir">Intelligent_Agent_Systems_LLMs/</span>
+├── <span class="tree-dir">agents/</span>
+│   ├── <span class="tree-file">base_agent.py</span>       <span class="tree-dim"># BaseAgent ABC · AgentResult · AgentMessage</span>
+│   ├── <span class="tree-file">planner_agent.py</span>    <span class="tree-dim"># LLM → numbered implementation plan</span>
+│   ├── <span class="tree-file">coder_agent.py</span>      <span class="tree-dim"># LLM → Python code (iterative, feedback-aware)</span>
+│   ├── <span class="tree-file">tester_agent.py</span>     <span class="tree-dim"># Subprocess pytest — no LLM, deterministic</span>
+│   ├── <span class="tree-file">reviewer_agent.py</span>   <span class="tree-dim"># LLM → APPROVED or actionable bug list</span>
+│   ├── <span class="tree-new">reporter_agent.py</span>   <span class="tree-dim"># LLM narrative + self-contained HTML report</span>
+│   └── <span class="tree-new">single_agent.py</span>     <span class="tree-dim"># One-shot baseline — no plan, no loop</span>
+├── <span class="tree-dir">graph/</span>
+│   ├── <span class="tree-file">state.py</span>            <span class="tree-dim"># AgentState TypedDict — shared pipeline state</span>
+│   ├── <span class="tree-file">nodes.py</span>            <span class="tree-dim"># Node functions + should_continue() edge logic</span>
+│   └── <span class="tree-file">pipeline.py</span>         <span class="tree-dim"># build_graph() — compiles LangGraph StateGraph</span>
+├── <span class="tree-dir">benchmarks/</span>
+│   └── <span class="tree-file">humaneval.py</span>        <span class="tree-dim"># JSONL loader · check(candidate) → pytest adapter</span>
+├── <span class="tree-dir">utils/</span>
+│   ├── <span class="tree-file">llm_client.py</span>       <span class="tree-dim"># get_llm() factory · token counter · retry decorator</span>
+│   └── <span class="tree-file">metrics.py</span>          <span class="tree-dim"># MetricsCollector · AggregateMetrics</span>
+├── <span class="tree-dir">data/</span>
+│   └── <span class="tree-file">HumanEval.jsonl</span>     <span class="tree-dim"># 164 benchmark problems</span>
+├── <span class="tree-dir">results/</span>              <span class="tree-dim"># Generated: JSON + HTML reports</span>
+├── <span class="tree-new">run.py</span>               <span class="tree-dim"># Preset launcher — smoke / single / multi</span>
+├── <span class="tree-file">main.py</span>              <span class="tree-dim"># Full CLI entry point with all flags</span>
+└── <span class="tree-file">.env</span>                 <span class="tree-dim"># MODEL, OPENAI_API_KEY, ANTHROPIC_API_KEY</span>
+  </div>
+
+  <hr />
+
+  <h2>Key Dependencies</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Package</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>langgraph</code></td><td>Stateful agent graph orchestration (the pipeline engine)</td></tr>
+        <tr><td><code>langchain-anthropic</code></td><td>Claude model integration via LangChain</td></tr>
+        <tr><td><code>langchain-openai</code></td><td>GPT model integration via LangChain</td></tr>
+        <tr><td><code>tenacity</code></td><td>Exponential-backoff retry for LLM calls</td></tr>
+        <tr><td><code>python-dotenv</code></td><td>Loads <code>.env</code> before argparse runs</td></tr>
+        <tr><td><code>loguru</code></td><td>Structured logging across all agents and nodes</td></tr>
+        <tr><td><code>pytest</code></td><td>Test runner invoked by TesterAgent via subprocess</td></tr>
+        <tr><td><code>pydantic</code> ≥ 2</td><td>Data validation</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════════════════════ PIPELINE ════════════════════════════════════ -->
+<div id="tab-pipeline" class="tab-panel">
+<div class="inner">
+
+  <div class="section-label">Architecture</div>
+  <h2>Multi-Agent Pipeline — LangGraph StateGraph</h2>
+  <p>
+    Built as a <strong>LangGraph StateGraph</strong>. Each agent is a node; the shared
+    <code>AgentState</code> dict is passed between them. A <strong>conditional edge</strong>
+    after the Reviewer implements the feedback loop.
+  </p>
+
+  <div class="pipeline">
+    <div class="pipe-node">
+      <div class="pipe-icon pi-start">&#9654;</div>
+      <div class="pipe-label">START</div>
+      <div class="pipe-desc">Problem from HumanEval</div>
+    </div>
+    <div class="pipe-arrow">&#8594;</div>
+    <div class="pipe-node">
+      <div class="pipe-icon pi-plan">&#128196;</div>
+      <div class="pipe-label">Planner</div>
+      <div class="pipe-desc">Step-by-step plan</div>
+    </div>
+    <div class="pipe-arrow">&#8594;</div>
+    <div class="pipe-node">
+      <div class="pipe-icon pi-code">&#128187;</div>
+      <div class="pipe-label">Coder</div>
+      <div class="pipe-desc">Python code</div>
+    </div>
+    <div class="pipe-arrow">&#8594;</div>
+    <div class="pipe-node">
+      <div class="pipe-icon pi-test">&#129514;</div>
+      <div class="pipe-label">Tester</div>
+      <div class="pipe-desc">Runs pytest</div>
+    </div>
+    <div class="pipe-arrow">&#8594;</div>
+    <div class="pipe-node">
+      <div class="pipe-icon pi-review">&#128064;</div>
+      <div class="pipe-label">Reviewer</div>
+      <div class="pipe-desc">Approve or list bugs</div>
+    </div>
+    <div class="pipe-loop">
+      <div class="pipe-loop-line">loop if not done</div>
+      <div class="pipe-loop-arrow">&#8635;</div>
+    </div>
+    <div class="pipe-node">
+      <div class="pipe-icon pi-end">&#10003;</div>
+      <div class="pipe-label">END</div>
+      <div class="pipe-desc">Pass threshold or max iters</div>
+    </div>
+  </div>
+
+  <h3>Stopping Logic — <code>graph/nodes.py · should_continue()</code></h3>
+  <pre><code><span class="kw">def</span> <span class="fn">should_continue</span>(state: AgentState) -> str:
+    total     = state[<span class="str">"test_passed"</span>] + state[<span class="str">"test_failed"</span>] + state[<span class="str">"test_errors"</span>]
+    pass_rate = state[<span class="str">"test_passed"</span>] / total <span class="kw">if</span> total > <span class="num">0</span> <span class="kw">else</span> <span class="num">0.0</span>
+
+    <span class="kw">if</span> pass_rate >= state[<span class="str">"pass_threshold"</span>]:
+        <span class="kw">return</span> <span class="str">"end"</span>       <span class="cmt"># all tests pass → done</span>
+
+    <span class="kw">if</span> state[<span class="str">"iteration"</span>] >= state[<span class="str">"max_iterations"</span>]:
+        <span class="kw">return</span> <span class="str">"end"</span>       <span class="cmt"># budget exhausted → done</span>
+
+    <span class="kw">return</span> <span class="str">"continue"</span>       <span class="cmt"># loop back to CoderAgent</span></code></pre>
+
+  <hr />
+
+  <h2>Single-Agent Baseline</h2>
+  <p>One LLM call, one test run, no feedback. Same benchmark, model, and TesterAgent — results are directly comparable.</p>
+  <div class="pipeline" style="justify-content:flex-start;">
+    <div class="pipe-node">
+      <div class="pipe-icon pi-start">&#9654;</div>
+      <div class="pipe-label">Problem</div>
+      <div class="pipe-desc">HumanEval</div>
+    </div>
+    <div class="pipe-arrow">&#8594;</div>
+    <div class="pipe-node">
+      <div class="pipe-icon pi-code">&#129302;</div>
+      <div class="pipe-label">SingleAgent</div>
+      <div class="pipe-desc">One LLM call</div>
+    </div>
+    <div class="pipe-arrow">&#8594;</div>
+    <div class="pipe-node">
+      <div class="pipe-icon pi-test">&#129514;</div>
+      <div class="pipe-label">Tester</div>
+      <div class="pipe-desc">Runs pytest</div>
+    </div>
+    <div class="pipe-arrow">&#8594;</div>
+    <div class="pipe-node">
+      <div class="pipe-icon pi-end">&#10003;</div>
+      <div class="pipe-label">Result</div>
+      <div class="pipe-desc">No retry</div>
+    </div>
+  </div>
+
+  <hr />
+
+  <h2>Shared State — <code>graph/state.py · AgentState</code></h2>
+  <p>All nodes read from and write to a single TypedDict. LangGraph merges partial dicts after each node.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Field</th><th>Type</th><th>Set By</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>problem_id</code></td><td>str</td><td>main.py</td><td>Identifier e.g. <code>HumanEval/0</code></td></tr>
+        <tr><td><code>problem_description</code></td><td>str</td><td>main.py</td><td>Function signature + docstring</td></tr>
+        <tr><td><code>tests</code></td><td>str</td><td>main.py</td><td>pytest-ready test file</td></tr>
+        <tr><td><code>plan</code></td><td>str</td><td>PlannerAgent</td><td>Numbered implementation strategy</td></tr>
+        <tr><td><code>code</code></td><td>str</td><td>CoderAgent</td><td>Latest generated Python code</td></tr>
+        <tr><td><code>test_output</code></td><td>str</td><td>TesterAgent</td><td>Raw pytest stdout/stderr</td></tr>
+        <tr><td><code>test_passed / failed / errors</code></td><td>int</td><td>TesterAgent</td><td>Test result counts</td></tr>
+        <tr><td><code>review</code></td><td>str</td><td>ReviewerAgent</td><td><code>APPROVED</code> or bug list</td></tr>
+        <tr><td><code>approved</code></td><td>bool</td><td>ReviewerAgent</td><td>True when review contains APPROVED</td></tr>
+        <tr><td><code>iteration</code></td><td>int</td><td>coder_node</td><td>Current loop count (1-based)</td></tr>
+        <tr><td><code>max_iterations</code></td><td>int</td><td>main.py</td><td>Hard stop for the feedback loop</td></tr>
+        <tr><td><code>pass_threshold</code></td><td>float</td><td>main.py</td><td>Fraction of tests required to stop (default 1.0)</td></tr>
+        <tr><td><code>total_tokens</code></td><td>int</td><td>LLM nodes</td><td>Running token counter for cost tracking</td></tr>
+        <tr><td><code>history</code></td><td>list[dict]</td><td>reviewer_node</td><td>Per-iteration snapshot: code, pass_rate, review, tokens</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════════════════════ AGENTS ══════════════════════════════════════ -->
+<div id="tab-agents" class="tab-panel">
+<div class="inner">
+
+  <div class="section-label">Agents</div>
+  <h2>Agent Roles &amp; Responsibilities</h2>
+  <p>Every LLM agent inherits from <code>BaseAgent</code>, which provides conversation history, token tracking,
+  and the abstract <code>run()</code> interface. The TesterAgent is fully deterministic — no LLM.</p>
+
+  <hr />
+
+  <h3>BaseAgent — <code>agents/base_agent.py</code></h3>
+  <p>Abstract base class. Defines the contract and shared infrastructure for all agents.</p>
+  <div class="card-grid" style="grid-template-columns:1fr;">
+    <div class="card">
+      <div class="card-head"><span class="card-icon">&#127959;</span>
+        <div><div class="card-title">BaseAgent (ABC)</div><div class="card-file">agents/base_agent.py</div></div>
+      </div>
+      <p>Holds <code>name</code>, <code>model</code>, <code>system_prompt</code>, <code>conversation_history</code>,
+      and <code>total_tokens_used</code>. Provides <code>reset()</code> and <code>_add_message()</code>.
+      Subclasses must implement <code>run(task, context) → AgentResult</code>.<br><br>
+      <strong>AgentResult</strong> carries: <code>agent_name</code>, <code>output</code>,
+      <code>success</code>, <code>tokens_used</code>, <code>iterations</code>, <code>metadata</code>.</p>
+    </div>
+  </div>
+
+  <hr />
+
+  <h3>PlannerAgent — <code>agents/planner_agent.py</code></h3>
+  <span class="badge badge-llm">&#128161; LLM Agent</span>
+  <div class="card-grid" style="grid-template-columns:1fr;">
+    <div class="card">
+      <p><strong>Role:</strong> Software architect. Produces a clear, numbered step-by-step implementation strategy — <em>no code, only a plan</em>.<br><br>
+      <strong>System prompt:</strong> focus on algorithm choice, data structures, edge cases. Explicitly told not to write code.<br><br>
+      <strong>Input:</strong> <code>problem_description</code><br>
+      <strong>Output → </strong><code>state["plan"]</code><br>
+      <strong>Retry:</strong> Tenacity exponential backoff (3 attempts, 4–60 s)</p>
+    </div>
+  </div>
+
+  <hr />
+
+  <h3>CoderAgent — <code>agents/coder_agent.py</code></h3>
+  <span class="badge badge-llm">&#128161; LLM Agent</span>
+  <div class="card-grid" style="grid-template-columns:1fr;">
+    <div class="card">
+      <p><strong>Role:</strong> Python developer. Writes and iteratively fixes code based on plan, test results, and reviewer notes.<br><br>
+      <strong>Iteration 1:</strong> problem + plan.<br>
+      <strong>Iteration 2+:</strong> additionally receives <code>previous_code</code>, <code>test_feedback</code>, <code>review</code>.<br><br>
+      <strong>Code extraction:</strong> strips <code>```python ... ```</code> fence. Falls back to raw text if no fence found.<br><br>
+      <strong>Output → </strong><code>state["code"]</code>, <code>state["iteration"]</code></p>
+    </div>
+  </div>
+
+  <hr />
+
+  <h3>TesterAgent — <code>agents/tester_agent.py</code></h3>
+  <span class="badge badge-det">&#9881; Deterministic — No LLM</span>
+  <div class="card-grid" style="grid-template-columns:1fr;">
+    <div class="card">
+      <p><strong>Role:</strong> QA executor. Runs the official HumanEval tests — zero LLM cost, fully reproducible.</p>
+      <ol style="padding-left:17px; color:var(--muted); font-size:.8rem; margin-top:10px; line-height:2;">
+        <li>Writes <code>solution.py</code> to a fresh temp directory</li>
+        <li>Writes <code>test_solution.py</code> (adapted HumanEval checks) to same dir</li>
+        <li>Runs <code>python -m pytest --tb=short</code> via subprocess (30 s timeout)</li>
+        <li>Parses PASSED / FAILED / ERROR counts from stdout</li>
+      </ol>
+      <p style="margin-top:10px;"><strong>Output → </strong><code>test_passed</code>, <code>test_failed</code>, <code>test_errors</code>, <code>test_output</code></p>
+    </div>
+  </div>
+
+  <h4>How HumanEval Tests Are Adapted</h4>
+  <p>HumanEval uses <code>check(candidate)</code> — not pytest-discoverable. The benchmark loader converts them automatically:</p>
+  <pre><code><span class="cmt"># Original HumanEval test field:</span>
+<span class="kw">def</span> <span class="fn">check</span>(candidate):
+    assert candidate([<span class="num">1.0</span>, <span class="num">2.0</span>, <span class="num">3.9</span>], <span class="num">0.3</span>) == <span class="cls">True</span>
+
+<span class="cmt"># After _adapt_tests_to_pytest(raw_test, entry_point="has_close_elements"):</span>
+<span class="kw">from</span> solution <span class="kw">import</span> has_close_elements
+
+<span class="kw">def</span> <span class="fn">check</span>(candidate):
+    assert candidate([<span class="num">1.0</span>, <span class="num">2.0</span>, <span class="num">3.9</span>], <span class="num">0.3</span>) == <span class="cls">True</span>
+
+<span class="kw">def</span> <span class="fn">test_check</span>():               <span class="cmt"># pytest discovers this</span>
+    check(has_close_elements)    <span class="cmt"># passes the generated function to checker</span></code></pre>
+
+  <hr />
+
+  <h3>ReviewerAgent — <code>agents/reviewer_agent.py</code></h3>
+  <span class="badge badge-llm">&#128161; LLM Agent</span>
+  <div class="card-grid" style="grid-template-columns:1fr;">
+    <div class="card">
+      <p><strong>Role:</strong> Senior code reviewer. Reads the problem, plan, code, and test results. Decides the next action.<br><br>
+      <strong style="color:var(--green)">APPROVED</strong> — terminates the loop.<br>
+      <strong style="color:var(--red)">Bug list</strong> — numbered, actionable issues. Does <em>not</em> rewrite code itself.<br><br>
+      <strong>Approval detection:</strong> <code>"APPROVED" in result.output.upper()</code> — case-insensitive.<br>
+      <strong>Output → </strong><code>review</code>, <code>approved</code>, <code>history</code> entry</p>
+    </div>
+  </div>
+
+  <hr />
+
+  <h3>ReporterAgent — <code>agents/reporter_agent.py</code></h3>
+  <span class="badge badge-llm">&#128161; LLM Agent</span>
+  <div class="card-grid" style="grid-template-columns:1fr;">
+    <div class="card">
+      <p><strong>Role:</strong> Technical writer. After the graph exits, generates an LLM narrative per problem and assembles
+      a self-contained HTML report.<br><br>
+      <strong>Report includes:</strong> aggregate metrics dashboard, per-problem cards with plan, iteration history,
+      final code, and test output. Written to <code>results/report_{mode}_{timestamp}.html</code>.</p>
+    </div>
+  </div>
+
+  <hr />
+
+  <h3>SingleAgent — <code>agents/single_agent.py</code></h3>
+  <span class="badge badge-base">&#127919; Baseline</span>
+  <div class="card-grid" style="grid-template-columns:1fr;">
+    <div class="card">
+      <p><strong>Role:</strong> Baseline comparator. One LLM call with only the problem description — no plan, no review, no retry.
+      Same code extraction as CoderAgent, same TesterAgent. Activated by <code>python run.py single</code>.</p>
+    </div>
+  </div>
+
+  <hr />
+
+  <h3>LLM Client — <code>utils/llm_client.py</code></h3>
+  <div class="card-grid" style="grid-template-columns:1fr;">
+    <div class="card">
+      <p><strong><code>get_llm(model)</code></strong> — returns <code>ChatAnthropic</code> when name starts with <code>"claude-"</code>,
+      otherwise <code>ChatOpenAI</code>. Temperature always 0.<br><br>
+      <strong><code>get_tokens_used(response)</code></strong> — reads <code>usage_metadata</code> from LangChain response.<br><br>
+      <strong><code>@llm_retry</code></strong> — Tenacity: 3 attempts, exponential wait 4–60 s, skips retry on 401/403.</p>
+    </div>
+  </div>
+
+  <hr />
+
+  <h3>MetricsCollector — <code>utils/metrics.py</code></h3>
+  <div class="card-grid" style="grid-template-columns:1fr;">
+    <div class="card">
+      <p>Accumulates <code>AgentState</code> snapshots per problem and computes aggregate metrics.</p>
+      <div class="table-wrap" style="margin-top:12px;">
+        <table>
+          <thead><tr><th>Metric</th><th>Formula</th><th>What it reveals</th></tr></thead>
+          <tbody>
+            <tr><td><code>solve rate</code></td><td>solved / total</td><td>Overall success rate</td></tr>
+            <tr><td><code>pass@1</code></td><td>solved in iter 1 / total</td><td>Single-shot accuracy</td></tr>
+            <tr><td><code>overall_pass_rate</code></td><td>mean(passed/total) per problem</td><td>Partial-credit accuracy</td></tr>
+            <tr><td><code>avg_iterations</code></td><td>mean iterations per problem</td><td>How much the loop was needed</td></tr>
+            <tr><td><code>total_tokens</code></td><td>sum across all problems</td><td>API cost proxy</td></tr>
+            <tr><td><code>avg_tokens_per_problem</code></td><td>total / n</td><td>Per-problem efficiency</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════════════════════ DATA FLOW ═══════════════════════════════════ -->
+<div id="tab-dataflow" class="tab-panel">
+<div class="inner">
+
+  <div class="section-label">Data Flow</div>
+  <h2>End-to-End Execution — Multi-Agent Mode</h2>
+  <p>The full pipeline: Planner → Coder → Tester → Reviewer, with a feedback loop between Reviewer and Coder.</p>
+
+  <ol class="steps">
+    <li><div class="step-num"></div><div>
+      <strong>Load benchmark</strong>
+      <p><code>main.py</code> loads <code>HumanEval.jsonl</code> via <code>HumanEvalBenchmark</code>.
+      Each <code>Problem</code> has: <code>problem_id</code>, <code>description</code>,
+      <code>entry_point</code>, <code>canonical_solution</code>, <code>tests</code> (already pytest-adapted).</p>
+    </div></li>
+    <li><div class="step-num"></div><div>
+      <strong>Initialise AgentState</strong>
+      <p>Builds the initial state with problem fields, empty outputs, <code>iteration=0</code>,
+      and run config. Calls <code>graph.invoke(initial_state)</code>.</p>
+    </div></li>
+    <li><div class="step-num"></div><div>
+      <strong>Planner node</strong>
+      <p>Sends problem description to LLM. Response is a plain-text numbered plan.
+      Updates <code>state["plan"]</code> and <code>state["total_tokens"]</code>.</p>
+    </div></li>
+    <li><div class="step-num"></div><div>
+      <strong>Coder node</strong>
+      <p>Builds prompt from problem + plan (+ previous code, test output, review on retries).
+      Extracts code from <code>```python```</code> fence.
+      Updates <code>state["code"]</code> and increments <code>state["iteration"]</code>.</p>
+    </div></li>
+    <li><div class="step-num"></div><div>
+      <strong>Tester node</strong>
+      <p>Writes <code>solution.py</code> and <code>test_solution.py</code> to a fresh temp dir.
+      Runs pytest. Parses PASSED / FAILED / ERROR counts.
+      Updates <code>test_passed</code>, <code>test_failed</code>, <code>test_errors</code>, <code>test_output</code>.</p>
+    </div></li>
+    <li><div class="step-num"></div><div>
+      <strong>Reviewer node</strong>
+      <p>Sends problem + plan + code + test summary to LLM. Sets <code>approved=True</code> if APPROVED in response.
+      Appends iteration snapshot to <code>state["history"]</code>.</p>
+    </div></li>
+    <li><div class="step-num"></div><div>
+      <strong>Conditional edge — should_continue()</strong>
+      <p>If <code>pass_rate ≥ pass_threshold</code> or <code>iteration ≥ max_iterations</code> → END.
+      Otherwise → back to step 4 (Coder).</p>
+    </div></li>
+    <li><div class="step-num"></div><div>
+      <strong>Collect + next problem</strong>
+      <p>Final state passed to <code>MetricsCollector.add_from_state()</code>. Loop repeats for all problems.</p>
+    </div></li>
+    <li><div class="step-num"></div><div>
+      <strong>Reporter + save results</strong>
+      <p>Metrics saved to JSON. <code>ReporterAgent</code> generates
+      <code>results/report_{mode}_{timestamp}.html</code>.</p>
+    </div></li>
+  </ol>
+
+  <hr />
+
+  <h2>End-to-End Execution — Single-Agent Mode</h2>
+  <p>The baseline: one LLM call, one test run, no loop. Activated by <code>python run.py single</code>.</p>
+
+  <ol class="steps">
+    <li><div class="step-num"></div><div>
+      <strong>Load benchmark</strong>
+      <p>Same as multi-agent: <code>HumanEvalBenchmark</code> loads <code>HumanEval.jsonl</code>.
+      Each <code>Problem</code> carries <code>problem_id</code>, <code>description</code>, <code>entry_point</code>,
+      <code>canonical_solution</code>, and <code>tests</code> (already pytest-adapted).</p>
+    </div></li>
+    <li><div class="step-num"></div><div>
+      <strong>SingleAgent generates code</strong>
+      <p><code>SingleAgent.run(task=problem.description)</code> makes a single LLM call with only
+      the problem description — no plan, no prior feedback. Returns an <code>AgentResult</code>
+      with the extracted Python code and token count.</p>
+    </div></li>
+    <li><div class="step-num"></div><div>
+      <strong>TesterAgent executes tests</strong>
+      <p><code>TesterAgent.execute_tests(code, tests)</code> writes <code>solution.py</code> and
+      <code>test_solution.py</code> to a temp dir and runs pytest. Returns
+      <code>passed</code>, <code>failed</code>, <code>errors</code>, and <code>output</code>.</p>
+    </div></li>
+    <li><div class="step-num"></div><div>
+      <strong>Build AgentState snapshot</strong>
+      <p><code>main.py</code> manually constructs an <code>AgentState</code> dict from the results —
+      <code>iteration=1</code>, <code>max_iterations=1</code>, no plan, no review.
+      This keeps the output format identical to multi-agent for fair metric comparison.</p>
+    </div></li>
+    <li><div class="step-num"></div><div>
+      <strong>Collect metrics + next problem</strong>
+      <p>State passed to <code>MetricsCollector.add_from_state()</code>. No retry — loop moves
+      immediately to the next problem.</p>
+    </div></li>
+    <li><div class="step-num"></div><div>
+      <strong>Reporter + save results</strong>
+      <p>Metrics saved to <code>results/single.json</code>.
+      <code>ReporterAgent</code> generates <code>results/report_single_{timestamp}.html</code>.</p>
+    </div></li>
+  </ol>
+
+  <div class="callout info">
+    <span class="callout-icon">&#8644;</span>
+    <div class="callout-body">
+      <strong>Why the same AgentState format?</strong>
+      Both modes write to the same <code>AgentState</code> TypedDict and use the same
+      <code>MetricsCollector</code>. This means <code>pass@1</code>, <code>solve_rate</code>,
+      and <code>total_tokens</code> are computed identically — making the comparison between
+      <code>single.json</code> and <code>multi.json</code> fair and direct.
+    </div>
+  </div>
+
+  <hr />
+
+  <h2>Mode Comparison</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Aspect</th><th>Single-Agent</th><th>Multi-Agent</th></tr></thead>
+      <tbody>
+        <tr><td>LLM calls per problem</td><td>1</td><td>3 agents × N iterations</td></tr>
+        <tr><td>Planning</td><td>None</td><td>PlannerAgent produces a numbered plan</td></tr>
+        <tr><td>Retry on failure</td><td>No</td><td>Yes — up to <code>max_iterations</code></td></tr>
+        <tr><td>Test feedback</td><td>Not used</td><td>Fed back to Coder each iteration</td></tr>
+        <tr><td>Code review</td><td>None</td><td>ReviewerAgent approves or lists bugs</td></tr>
+        <tr><td>Token cost</td><td>Low (1 call)</td><td>Higher — scales with iterations needed</td></tr>
+        <tr><td>Expected advantage</td><td>Easy problems, low cost</td><td>Harder problems, better solve rate</td></tr>
+        <tr><td>Output file</td><td><code>results/single.json</code></td><td><code>results/multi.json</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr />
+
+  <h2>Prompt Content Per Agent</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Agent</th><th>System Prompt</th><th>User Prompt Content</th></tr></thead>
+      <tbody>
+        <tr><td>Planner</td><td>Software architect, algorithm + edge cases, no code</td><td>Problem description only</td></tr>
+        <tr><td>Coder (iter 1)</td><td>Expert Python dev, return only a <code>```python```</code> fence</td><td>Problem + plan</td></tr>
+        <tr><td>Coder (iter 2+)</td><td>Same</td><td>Problem + plan + previous code + test output + review</td></tr>
+        <tr><td>Tester</td><td colspan="2" style="color:var(--muted);font-style:italic;">No LLM — subprocess pytest</td></tr>
+        <tr><td>Reviewer</td><td>Senior reviewer: APPROVED or specific bugs only, no rewriting</td><td>Problem + plan + code + test results</td></tr>
+        <tr><td>SingleAgent</td><td>Expert Python dev, return only a <code>```python```</code> fence</td><td>Problem description only</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════════════════════ RUNNING IT ══════════════════════════════════ -->
+<div id="tab-run" class="tab-panel">
+<div class="inner">
+
+  <div class="section-label">Running It</div>
+  <h2>Setup</h2>
+
+  <ol class="steps">
+    <li><div class="step-num"></div><div>
+      <strong>Install dependencies</strong>
+      <pre><code>pipenv install</code></pre>
+    </div></li>
+    <li><div class="step-num"></div><div>
+      <strong>Configure <code>.env</code></strong>
+      <p>Copy <code>.env.example</code> → <code>.env</code>. The model is read automatically — no CLI flag needed.</p>
+      <pre><code>MODEL=gpt-4o-mini           <span class="cmt"># or claude-sonnet-4-6, gpt-4o …</span>
+OPENAI_API_KEY=sk-...       <span class="cmt"># for OpenAI models</span>
+ANTHROPIC_API_KEY=sk-ant-...<span class="cmt"># for Claude models</span></code></pre>
+    </div></li>
+  </ol>
+
+  <div class="callout info">
+    <span class="callout-icon">&#128161;</span>
+    <div class="callout-body">
+      <strong>Model selection</strong>
+      If <code>MODEL</code> starts with <code>claude-</code>, <code>ChatAnthropic</code> is used; otherwise <code>ChatOpenAI</code>.
+      Use <code>gpt-4o-mini</code> or <code>claude-haiku-4-5-20251001</code> during development to keep costs low.
+    </div>
+  </div>
+
+  <hr />
+
+  <h2>Run Modes</h2>
+  <p>All three modes are launched through <code>run.py</code>. No extra arguments needed.</p>
+
+  <div class="run-cards">
+    <div class="run-card mode-smoke">
+      <div class="run-card-mode">&#128293; Smoke</div>
+      <pre><code>pipenv run python run.py smoke</code></pre>
+      <ul>
+        <li>3 problems</li>
+        <li>Multi-agent pipeline</li>
+        <li>Max 5 iterations</li>
+        <li>Output: <code>results/smoke.json</code></li>
+        <li>Quick sanity check</li>
+      </ul>
+    </div>
+    <div class="run-card mode-single">
+      <div class="run-card-mode">&#127919; Single</div>
+      <pre><code>pipenv run python run.py single</code></pre>
+      <ul>
+        <li>20 problems</li>
+        <li>One LLM call per problem</li>
+        <li>No planning, no loop</li>
+        <li>Output: <code>results/single.json</code></li>
+        <li>Baseline for comparison</li>
+      </ul>
+    </div>
+    <div class="run-card mode-multi">
+      <div class="run-card-mode">&#129302; Multi</div>
+      <pre><code>pipenv run python run.py multi</code></pre>
+      <ul>
+        <li>20 problems</li>
+        <li>Full 4-agent pipeline</li>
+        <li>Max 10 iterations</li>
+        <li>Output: <code>results/multi.json</code></li>
+        <li>Full benchmark run</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr />
+
+  <h2>Output Files</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>File</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>results/{mode}.json</code></td><td>Full AgentState snapshots for all problems — per-iteration history, test counts, token totals, final code.</td></tr>
+        <tr><td><code>results/report_{mode}_{timestamp}.html</code></td><td>Self-contained HTML report with metrics dashboard, LLM narratives, and per-problem iteration history.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr />
+
+  <h2>Estimated API Cost (20 problems)</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Mode</th><th>Model</th><th>Approx LLM calls</th><th>Estimated cost</th></tr></thead>
+      <tbody>
+        <tr><td>single</td><td>gpt-4o-mini</td><td>20</td><td>~$0.02</td></tr>
+        <tr><td>multi</td><td>gpt-4o-mini</td><td>~200 (3 agents × avg 3 iters × 20)</td><td>~$0.20</td></tr>
+        <tr><td>single</td><td>gpt-4o</td><td>20</td><td>~$0.40</td></tr>
+        <tr><td>multi</td><td>gpt-4o</td><td>~200</td><td>~$4.00</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════════════════════ CONCEPTS ════════════════════════════════════ -->
+<div id="tab-concepts" class="tab-panel">
+<div class="inner">
+
+  <div class="section-label">Theoretical Background</div>
+  <h2>Core Concepts &amp; How They Are Implemented</h2>
+  <p>
+    The assignment targets three specific concepts from multi-agent systems theory.
+    Each one is defined below alongside how it is realised in <strong>both the multi-agent
+    pipeline and the single-agent baseline</strong> — the contrast between the two is what
+    makes the concepts measurable.
+  </p>
+
+  <!-- TASK DECOMPOSITION -->
+  <div class="concept-card">
+    <div class="concept-header">
+      <div class="concept-num cn-1">1</div>
+      <div class="concept-title">
+        <h3>Task Decomposition</h3>
+        <span class="en">Αποσύνθεση Εργασίας</span>
+      </div>
+    </div>
+    <div class="concept-body">
+      <div class="concept-col theory">
+        <h4>What It Is</h4>
+        <p>Instead of one general agent handling everything, a complex task is broken into smaller,
+        well-defined sub-tasks. Each sub-task is assigned to an agent that is specifically
+        designed — and constrained — to do only that one thing well.</p>
+        <p style="margin-top:10px;">The key benefit: specialisation reduces the cognitive load on each agent
+        and prevents one agent's mistakes from cascading into adjacent responsibilities.</p>
+      </div>
+      <div class="concept-col impl">
+        <h4>Multi-Agent — Full Decomposition</h4>
+        <p>The problem <em>"write correct Python code"</em> is split into four locked roles:</p>
+        <ul style="margin-top:8px;">
+          <li><span class="impl-tag">Planner</span> Algorithm strategy only — no code</li>
+          <li><span class="impl-tag">Coder</span> Implementation only — single code block</li>
+          <li><span class="impl-tag">Tester</span> Execution only — subprocess pytest, zero LLM</li>
+          <li><span class="impl-tag">Reviewer</span> Critique only — must not rewrite</li>
+        </ul>
+        <p style="margin-top:10px;">Each agent has a <strong>distinct system prompt</strong> enforcing its boundary.</p>
+        <h4 style="margin-top:14px; color:var(--muted);">Single-Agent — No Decomposition</h4>
+        <p>One agent (<code>SingleAgent</code>) is asked to do everything at once:
+        understand the problem, plan an approach, and produce correct code — in a single LLM call.
+        There are no role boundaries. This is the baseline that decomposition is compared against.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEEDBACK LOOPS -->
+  <div class="concept-card">
+    <div class="concept-header">
+      <div class="concept-num cn-2">2</div>
+      <div class="concept-title">
+        <h3>Feedback Loops</h3>
+        <span class="en">Βρόχοι Ανατροφοδότησης</span>
+      </div>
+    </div>
+    <div class="concept-body">
+      <div class="concept-col theory">
+        <h4>What It Is</h4>
+        <p>The output of one stage becomes the input of the next, and the system repeats
+        until a measurable quality criterion is met. This is a <em>closed-loop control</em>
+        mechanism — the system can observe its own performance and adjust accordingly.</p>
+        <p style="margin-top:10px;">Without a feedback loop, errors propagate with no correction path.
+        With one, the system can iteratively converge toward a correct solution.</p>
+      </div>
+      <div class="concept-col impl">
+        <h4>Multi-Agent — Closed-Loop Control</h4>
+        <p>The LangGraph conditional edge implements the loop:</p>
+        <pre style="margin:8px 0;font-size:.73rem;"><code>Coder → Tester → Reviewer
+                    ↓ should_continue()
+               "continue" → Coder (retry)
+               "end"      → END</code></pre>
+        <p>On each retry the Coder receives <span class="impl-tag">test_feedback</span>
+        <span class="impl-tag">review</span> <span class="impl-tag">previous_code</span>.
+        Stops when <code>pass_rate ≥ pass_threshold</code> or <code>iteration ≥ max_iterations</code>.</p>
+        <h4 style="margin-top:14px; color:var(--muted);">Single-Agent — Open Loop</h4>
+        <p>There is no loop. The code is generated once, tests are run once, and execution stops
+        regardless of whether the tests pass. Errors are observed but never acted on —
+        this is an <em>open-loop</em> system. The delta in solve rate between the two modes
+        directly measures how much the feedback loop contributes.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMERGENT BEHAVIOR -->
+  <div class="concept-card">
+    <div class="concept-header">
+      <div class="concept-num cn-3">3</div>
+      <div class="concept-title">
+        <h3>Emergent Behavior</h3>
+        <span class="en">Αναδυόμενη Συμπεριφορά</span>
+      </div>
+    </div>
+    <div class="concept-body">
+      <div class="concept-col theory">
+        <h4>What It Is</h4>
+        <p>Behavior that was <em>not explicitly programmed</em> into any individual agent,
+        but <strong>arises from their interaction</strong>. The system as a whole can do
+        something that none of its parts could do alone.</p>
+        <p style="margin-top:10px;">This is the most theoretically interesting concept — you cannot
+        point to a single line of code that produces it. It appears only when agents interact
+        through the shared state over multiple iterations.</p>
+      </div>
+      <div class="concept-col impl">
+        <h4>Multi-Agent — Emergent Iterative Debugging</h4>
+        <p>No single agent can debug code autonomously:</p>
+        <ul>
+          <li>Planner doesn't know if code will work</li>
+          <li>Coder doesn't run tests</li>
+          <li>Tester doesn't understand the code</li>
+          <li>Reviewer doesn't write code</li>
+        </ul>
+        <p style="margin-top:8px;">Together they produce <strong>automated iterative debugging</strong> —
+        a capability that none holds alone. It is measured as the solve-rate gap between
+        <code>multi.json</code> and <code>single.json</code>.</p>
+        <h4 style="margin-top:14px; color:var(--muted);">Single-Agent — No Emergence</h4>
+        <p>With only one agent and no interaction, there is nothing for emergent behavior to emerge <em>from</em>.
+        The single-agent result represents the upper bound of what a single LLM call can achieve
+        without collaboration — and serves as the control group that makes emergence measurable.</p>
+      </div>
+    </div>
+  </div>
+
+  <hr />
+
+  <h2>Summary</h2>
+  <div class="summary-row">
+    <div class="summary-cell">
+      <div class="label">Task Decomposition</div>
+      <div class="value">Multi: 4 locked roles · Single: 1 agent handles all</div>
+    </div>
+    <div class="summary-cell">
+      <div class="label">Feedback Loop</div>
+      <div class="value">Multi: closed-loop retry · Single: open-loop, one shot</div>
+    </div>
+    <div class="summary-cell">
+      <div class="label">Emergent Behavior</div>
+      <div class="value">Measured as solve-rate delta: multi.json − single.json</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+</div><!-- .tab-content -->
+
+<script>
+  function go(id, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+</script>
+</body>
+</html>
