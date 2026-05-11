@@ -1,4 +1,5 @@
 import argparse
+import os
 from datetime import datetime
 from pathlib import Path
 from dotenv import load_dotenv
@@ -17,7 +18,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-problems",   type=int,   default=10)
     parser.add_argument("--max-iterations", type=int,   default=5)
     parser.add_argument("--pass-threshold", type=float, default=1.0)
-    parser.add_argument("--model",          type=str,   default="gpt-4o")
+    parser.add_argument("--model",          type=str,   default=os.environ.get("MODEL", "gpt-4o"))
     parser.add_argument("--output",         type=str,   default="results/run.json")
     parser.add_argument(
         "--mode",

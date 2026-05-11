@@ -9,7 +9,6 @@ Usage:
 """
 import sys
 import subprocess
-from dotenv import dotenv_values
 
 CONFIGS = {
     "smoke": {
@@ -45,17 +44,13 @@ def main():
     mode = sys.argv[1]
     cfg = CONFIGS[mode]
 
-    env = dotenv_values(".env")
-    model = env.get("MODEL", "gpt-4o-mini")
-
-    print(f">> Mode: {mode} · model: {model}")
+    print(f">> Mode: {mode} (model from MODEL env var)")
 
     cmd = [
         sys.executable, "main.py",
         "--benchmark",      "data/HumanEval.jsonl",
         "--max-problems",   str(cfg["max_problems"]),
         "--max-iterations", str(cfg["max_iterations"]),
-        "--model",          model,
         "--mode",           cfg["mode"],
         "--output",         cfg["output"],
     ]
