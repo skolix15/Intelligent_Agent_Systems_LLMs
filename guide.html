@@ -3,28 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Project 12 — Complete Guide</title>
+  <title>Project 12 — Developer Guide</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#0f1117;color:#e2e8f0;min-height:100vh}
 
-    /* ── Header ── */
     header{background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);border-bottom:1px solid #334155;padding:28px 48px 0}
     header h1{font-size:1.5rem;font-weight:700;color:#f8fafc;letter-spacing:-.02em}
     header p.sub{color:#94a3b8;font-size:.875rem;margin-top:4px}
-    .tabs{display:flex;gap:2px;margin-top:24px}
+    .tabs{display:flex;gap:2px;margin-top:24px;flex-wrap:wrap}
     .tab-btn{padding:10px 22px;font-size:.85rem;font-weight:600;cursor:pointer;border:none;background:transparent;color:#64748b;border-radius:8px 8px 0 0;transition:all .15s}
     .tab-btn:hover{color:#cbd5e1;background:#1e293b}
     .tab-btn.active{background:#0f1117;color:#38bdf8;border:1px solid #334155;border-bottom:1px solid #0f1117}
 
-    /* ── Layout ── */
-    .content{padding:40px 48px;max-width:1140px}
+    .content{padding:40px 48px;max-width:1200px}
     .tab-panel{display:none}.tab-panel.active{display:block}
 
-    /* ── Typography ── */
     h2{font-size:1.15rem;font-weight:700;color:#f1f5f9;margin:38px 0 8px}
     h2:first-child{margin-top:0}
     h3{font-size:.95rem;font-weight:600;color:#cbd5e1;margin:22px 0 6px}
+    h4{font-size:.875rem;font-weight:700;color:#e2e8f0;margin:16px 0 5px}
     p,li{font-size:.875rem;line-height:1.8;color:#94a3b8}
     ul,ol{padding-left:20px}
     li{margin-bottom:3px}
@@ -32,740 +30,650 @@
     hr{border:none;border-top:1px solid #1e293b;margin:32px 0}
     code{font-family:"SF Mono","Fira Code",monospace;font-size:.78rem;background:#1e293b;padding:2px 6px;border-radius:4px;color:#a5f3fc}
 
-    /* ── Code block ── */
-    .cb{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:16px 20px;font-family:"SF Mono","Fira Code",monospace;font-size:.78rem;line-height:1.9;color:#a5f3fc;overflow-x:auto;margin:12px 0}
-    .kw{color:#c084fc}.cls{color:#38bdf8}.str{color:#34d399}.cmt{color:#475569;font-style:italic}.fn{color:#fbbf24}
+    .cb{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:16px 20px;font-family:"SF Mono","Fira Code",monospace;font-size:.78rem;line-height:1.9;color:#a5f3fc;overflow-x:auto;margin:12px 0;white-space:pre}
+    .kw{color:#c084fc}.cls{color:#38bdf8}.str{color:#34d399}.cmt{color:#475569;font-style:italic}.fn{color:#fbbf24}.dec{color:#fb923c}
 
-    /* ── File tree ── */
-    .tree{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:20px 24px;font-family:"SF Mono","Fira Code",monospace;font-size:.79rem;line-height:2.1;margin:16px 0}
-    .tree .dir{color:#38bdf8;font-weight:600}
-    .tree .file{color:#a5f3fc}
-    .tree .note{color:#475569;font-style:italic}
-    .bnew{display:inline-block;background:#064e3b;color:#34d399;font-size:.6rem;font-weight:700;text-transform:uppercase;padding:1px 6px;border-radius:4px;margin-left:6px;vertical-align:middle}
-    .bcore{display:inline-block;background:#1e3a5f;color:#60a5fa;font-size:.6rem;font-weight:700;text-transform:uppercase;padding:1px 6px;border-radius:4px;margin-left:6px;vertical-align:middle}
-
-    /* ── Flow diagram ── */
-    .flow{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:20px 24px;background:#1e293b;border:1px solid #334155;border-radius:10px;margin:16px 0}
-    .fstep{background:#0f172a;border:1px solid #475569;border-radius:8px;padding:8px 16px;font-size:.8rem;font-weight:600;color:#e2e8f0;white-space:nowrap}
-    .farrow{color:#475569;font-size:1.1rem}
-    .fback{font-size:.72rem;color:#fbbf24;background:#451a03;border:1px solid #92400e;border-radius:6px;padding:4px 10px;margin-left:6px}
-
-    /* ── Agent cards ── */
-    .agent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:16px 0}
-    .acard{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:16px 18px}
-    .acard:hover{border-color:#38bdf8}
-    .badge{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:4px;margin-bottom:8px}
-    .b-blue{background:#0c4a6e;color:#38bdf8}
-    .b-green{background:#064e3b;color:#34d399}
-    .b-yellow{background:#451a03;color:#fbbf24}
-    .b-purple{background:#3b0764;color:#c084fc}
-    .b-gray{background:#1e293b;color:#64748b;border:1px solid #334155}
-    .acard h4{font-size:.9rem;font-weight:700;color:#f1f5f9;margin-bottom:5px}
-    .acard p{font-size:.78rem;color:#64748b;line-height:1.6}
-
-    /* ── Table ── */
     table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.82rem}
     th{background:#1e293b;color:#94a3b8;font-weight:600;text-align:left;padding:10px 14px;border:1px solid #334155;text-transform:uppercase;font-size:.7rem;letter-spacing:.05em}
     td{padding:10px 14px;border:1px solid #1e293b;color:#cbd5e1;background:#0f1117}
     tr:hover td{background:#1e293b}
-    .pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.72rem;font-weight:600}
-    .pg{background:#064e3b;color:#34d399}
-    .py{background:#451a03;color:#fbbf24}
-    .pr{background:#450a0a;color:#f87171}
 
-    /* ── Step list ── */
-    .steps{list-style:none;padding:0;margin:16px 0}
-    .steps li{display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px solid #1e293b}
-    .steps li:last-child{border-bottom:none}
-    .snum{flex-shrink:0;width:28px;height:28px;border-radius:50%;background:#0c4a6e;color:#38bdf8;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center}
-    .sbody{flex:1}
-    .sbody strong{display:block;color:#e2e8f0;font-size:.875rem;margin-bottom:3px}
-    .sbody span,.sbody p{color:#64748b;font-size:.8rem;line-height:1.7}
-
-    /* ── Info / warn boxes ── */
     .info{background:#0c1a2e;border:1px solid #1e40af;border-radius:8px;padding:14px 18px;margin:14px 0;font-size:.82rem;color:#93c5fd;line-height:1.7}
     .warn{background:#1c1400;border:1px solid #854d0e;border-radius:8px;padding:14px 18px;margin:14px 0;font-size:.82rem;color:#fde68a;line-height:1.7}
     .good{background:#052e16;border:1px solid #166534;border-radius:8px;padding:14px 18px;margin:14px 0;font-size:.82rem;color:#86efac;line-height:1.7}
 
-    /* ── Lib cards ── */
-    .lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin:16px 0}
-    .lcard{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:16px 18px}
-    .lcard .lname{font-family:"SF Mono","Fira Code",monospace;font-size:.82rem;color:#38bdf8;font-weight:700;margin-bottom:6px}
-    .lcard .lver{font-size:.68rem;color:#475569;margin-left:6px}
-    .lcard p{font-size:.78rem;color:#64748b;line-height:1.6}
-    .lcard .ltag{display:inline-block;font-size:.65rem;font-weight:700;text-transform:uppercase;padding:2px 7px;border-radius:4px;margin-top:6px}
-    .lt-core{background:#0c4a6e;color:#38bdf8}
-    .lt-llm{background:#3b0764;color:#c084fc}
-    .lt-dev{background:#1e293b;color:#64748b;border:1px solid #334155}
-    .lt-util{background:#064e3b;color:#34d399}
+    .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin:16px 0}
+    .card{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:16px 18px}
+    .card:hover{border-color:#38bdf8}
+    .card h4{font-size:.9rem;font-weight:700;color:#f1f5f9;margin:0 0 6px}
+    .card p{font-size:.78rem;color:#64748b;line-height:1.6;margin:0}
+    .badge{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:4px;margin-bottom:8px}
+    .b-green{background:#064e3b;color:#34d399}
+    .b-blue{background:#0c2340;color:#38bdf8}
+
+    .flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:16px 0}
+    .fbox{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:10px 16px;font-size:.8rem;font-weight:600;color:#e2e8f0;text-align:center;min-width:110px}
+    .fbox.entry{border-color:#38bdf8;color:#38bdf8}
+    .fbox.end{border-color:#34d399;color:#34d399}
+    .farr{color:#475569;font-size:1rem}
+    .floop{color:#fbbf24;font-size:.72rem;font-weight:600;margin:0 4px}
+
+    .file-tree{font-family:"SF Mono","Fira Code",monospace;font-size:.78rem;background:#1e293b;border:1px solid #334155;border-radius:8px;padding:16px 20px;line-height:2;color:#a5f3fc;margin:12px 0}
+    .ft-dir{color:#38bdf8}
+    .ft-new{color:#34d399}
+    .ft-done{color:#86efac}
+    .ft-comment{color:#475569}
   </style>
 </head>
 <body>
 
 <header>
-  <h1>Project 12 — Multi-Agent Software Engineering</h1>
-  <p class="sub">Complete Guide · LangGraph + Python · Academic Year 2025–2026</p>
+  <h1>Project 12 — Multi-Agent Software Engineering: Developer Guide</h1>
+  <p class="sub">Architecture, data flow, agent design, and how to run the system · updated 2026-05-09</p>
   <div class="tabs">
-    <button class="tab-btn active" onclick="go('structure')">Structure</button>
-    <button class="tab-btn"        onclick="go('agents')">Agents &amp; Graph</button>
-    <button class="tab-btn"        onclick="go('libs')">Libraries</button>
-    <button class="tab-btn"        onclick="go('steps')">Steps to Build</button>
+    <button class="tab-btn active" onclick="go('overview')">Overview</button>
+    <button class="tab-btn"        onclick="go('arch')">Architecture</button>
+    <button class="tab-btn"        onclick="go('agents')">Agents</button>
+    <button class="tab-btn"        onclick="go('data')">Data Flow</button>
+    <button class="tab-btn"        onclick="go('run')">Running It</button>
+    <button class="tab-btn"        onclick="go('status')">Current Status</button>
   </div>
 </header>
 
 <div class="content">
 
-<!-- ═══════════════════════════════════════════ TAB 1 — STRUCTURE ══════════ -->
-<div id="tab-structure" class="tab-panel active">
+<!-- ═══════════════ TAB 1 — OVERVIEW ═══════════════════════════════════════ -->
+<div id="tab-overview" class="tab-panel active">
 
-  <h2>Project Goal</h2>
+  <h2>What Is This Project?</h2>
   <p>
-    Build a <strong>multi-agent system</strong> where four specialised AI agents collaborate
-    to solve Python programming problems autonomously.
-    One agent plans, one writes code, one tests it with pytest, and one reviews the result.
-    They run in a <strong>feedback loop</strong> powered by LangGraph until tests pass or
-    the iteration limit is hit. The system is benchmarked against HumanEval and compared
-    to a single-agent baseline.
+    A <strong>multi-agent system</strong> where specialised LLM agents collaborate to solve Python
+    programming problems from the <strong>HumanEval benchmark</strong>.
+    Four agents — Planner, Coder, Tester, Reviewer — form a feedback loop that iteratively
+    writes, tests, and improves code until all tests pass or the iteration budget is exhausted.
   </p>
-
-  <hr />
-
-  <h2>Directory Layout</h2>
-  <div class="tree">
-    <span class="dir">LLM_12_Project/</span><br />
-    &nbsp;&nbsp;├── <span class="dir">agents/</span><br />
-    &nbsp;&nbsp;│&nbsp;&nbsp; ├── <span class="file">__init__.py</span><br />
-    &nbsp;&nbsp;│&nbsp;&nbsp; ├── <span class="file">base_agent.py</span> &nbsp;&nbsp;<span class="note"># abstract base, AgentMessage, AgentResult</span><br />
-    &nbsp;&nbsp;│&nbsp;&nbsp; ├── <span class="file">planner_agent.py</span> &nbsp;&nbsp;<span class="note"># breaks problem into a plan</span><br />
-    &nbsp;&nbsp;│&nbsp;&nbsp; ├── <span class="file">coder_agent.py</span> &nbsp;&nbsp;<span class="note"># writes / fixes Python code</span><br />
-    &nbsp;&nbsp;│&nbsp;&nbsp; ├── <span class="file">tester_agent.py</span> &nbsp;&nbsp;<span class="note"># runs pytest in subprocess, no LLM</span><br />
-    &nbsp;&nbsp;│&nbsp;&nbsp; └── <span class="file">reviewer_agent.py</span> &nbsp;&nbsp;<span class="note"># reviews code quality &amp; edge cases</span><br />
-    &nbsp;&nbsp;├── <span class="dir">graph/</span> <span class="bcore">LangGraph</span><br />
-    &nbsp;&nbsp;│&nbsp;&nbsp; ├── <span class="file">__init__.py</span><br />
-    &nbsp;&nbsp;│&nbsp;&nbsp; ├── <span class="file">state.py</span> &nbsp;&nbsp;<span class="note"># AgentState TypedDict — shared memory</span><br />
-    &nbsp;&nbsp;│&nbsp;&nbsp; ├── <span class="file">nodes.py</span> &nbsp;&nbsp;<span class="note"># node functions that wrap each agent</span><br />
-    &nbsp;&nbsp;│&nbsp;&nbsp; └── <span class="file">pipeline.py</span> &nbsp;&nbsp;<span class="note"># StateGraph wiring + compile()</span><br />
-    &nbsp;&nbsp;├── <span class="dir">benchmarks/</span><br />
-    &nbsp;&nbsp;│&nbsp;&nbsp; └── <span class="file">humaneval.py</span> &nbsp;&nbsp;<span class="note"># loads HumanEval .jsonl problems</span><br />
-    &nbsp;&nbsp;├── <span class="dir">utils/</span><br />
-    &nbsp;&nbsp;│&nbsp;&nbsp; └── <span class="file">metrics.py</span> &nbsp;&nbsp;<span class="note"># aggregates pass rate, tokens, iterations</span><br />
-    &nbsp;&nbsp;├── <span class="dir">tests/</span> &nbsp;&nbsp;<span class="note"># pytest tests for YOUR code (not generated code)</span><br />
-    &nbsp;&nbsp;│&nbsp;&nbsp; ├── <span class="file">test_tester_agent.py</span> &nbsp;&nbsp;<span class="note"># verifies subprocess sandbox works</span><br />
-    &nbsp;&nbsp;│&nbsp;&nbsp; ├── <span class="file">test_graph_state.py</span> &nbsp;&nbsp;<span class="note"># verifies stopping conditions</span><br />
-    &nbsp;&nbsp;│&nbsp;&nbsp; └── <span class="file">test_benchmark_loader.py</span> &nbsp;&nbsp;<span class="note"># verifies JSONL parsing</span><br />
-    &nbsp;&nbsp;├── <span class="dir">results/</span> &nbsp;&nbsp;<span class="note"># JSON output files from benchmark runs</span><br />
-    &nbsp;&nbsp;├── <span class="dir">data/</span> &nbsp;&nbsp;<span class="note"># place HumanEval.jsonl here</span><br />
-    &nbsp;&nbsp;├── <span class="file">main.py</span> &nbsp;&nbsp;<span class="note"># CLI entry point</span><br />
-    &nbsp;&nbsp;├── <span class="file">Pipfile</span> &nbsp;&nbsp;<span class="note"># all dependencies</span><br />
-    &nbsp;&nbsp;└── <span class="file">.env</span> &nbsp;&nbsp;<span class="note"># API keys (never commit this)</span>
-  </div>
-
-  <hr />
-
-  <h2>Two Testing Layers — Important Distinction</h2>
-  <table>
-    <thead><tr><th>Layer</th><th>What is tested</th><th>Tool</th><th>Where</th></tr></thead>
-    <tbody>
-      <tr>
-        <td><strong>Inside the loop</strong></td>
-        <td>The Python code CoderAgent generated</td>
-        <td>pytest (subprocess)</td>
-        <td><code>TesterAgent.execute_tests()</code></td>
-      </tr>
-      <tr>
-        <td><strong>Your own system</strong></td>
-        <td>Graph logic, agent wiring, benchmark loader</td>
-        <td>pytest (normal)</td>
-        <td><code>tests/</code> folder</td>
-      </tr>
-    </tbody>
-  </table>
-  <div class="info">
-    Both use pytest — but they are completely separate. The first is part of the agent pipeline;
-    the second is your own unit test suite for verifying the system works correctly before
-    running expensive LLM calls.
-  </div>
-
-  <hr />
-
-  <h2>Data Flow at a Glance</h2>
-  <div class="flow">
-    <span class="fstep">HumanEval problem</span>
-    <span class="farrow">→</span>
-    <span class="fstep">AgentState (init)</span>
-    <span class="farrow">→</span>
-    <span class="fstep">graph.invoke()</span>
-    <span class="farrow">→</span>
-    <span class="fstep">AgentState (final)</span>
-    <span class="farrow">→</span>
-    <span class="fstep">MetricsCollector</span>
-    <span class="farrow">→</span>
-    <span class="fstep">results/run.json</span>
-  </div>
-
-  <h2>LangGraph Feedback Loop</h2>
-  <div class="flow">
-    <span class="fstep">planner_node</span>
-    <span class="farrow">→</span>
-    <span class="fstep">coder_node</span>
-    <span class="farrow">→</span>
-    <span class="fstep">tester_node</span>
-    <span class="farrow">→</span>
-    <span class="fstep">reviewer_node</span>
-    <span class="farrow">→</span>
-    <span class="fstep">should_continue()</span>
-    <span class="fback">↩ "continue" → back to coder_node</span>
-  </div>
-  <p style="margin-top:10px">
-    <code>should_continue()</code> returns <code>"end"</code> when
-    <strong>pass_rate ≥ threshold</strong> or <strong>iteration ≥ max_iterations</strong>.
-    Otherwise it returns <code>"continue"</code> and LangGraph routes back to <code>coder_node</code>.
-  </p>
-
-  <hr />
-
-  <h2>AgentState — the Shared Memory</h2>
   <p>
-    LangGraph passes a single <code>AgentState</code> dict through every node.
-    Each node reads what it needs and returns an updated copy.
-    Nothing is stored outside this dict during a run.
+    A <strong>single-agent baseline</strong> is also included: one LLM call, no loop.
+    The two modes run on the same benchmark so results are directly comparable.
   </p>
-  <table>
-    <thead><tr><th>Field</th><th>Type</th><th>Written by</th><th>Purpose</th></tr></thead>
-    <tbody>
-      <tr><td>problem_id</td><td>str</td><td>main.py</td><td>HumanEval task ID</td></tr>
-      <tr><td>problem_description</td><td>str</td><td>main.py</td><td>Prompt / function signature given to agents</td></tr>
-      <tr><td>tests</td><td>str</td><td>main.py</td><td>The <code>check()</code> test function from HumanEval</td></tr>
-      <tr><td>plan</td><td>str</td><td>planner_node</td><td>Step-by-step implementation plan</td></tr>
-      <tr><td>code</td><td>str</td><td>coder_node</td><td>Most recent generated Python solution</td></tr>
-      <tr><td>test_output</td><td>str</td><td>tester_node</td><td>Raw pytest stdout/stderr</td></tr>
-      <tr><td>test_passed / failed / errors</td><td>int</td><td>tester_node</td><td>Parsed test counts</td></tr>
-      <tr><td>review / approved</td><td>str / bool</td><td>reviewer_node</td><td>Review text; True when reviewer says APPROVED</td></tr>
-      <tr><td>iteration / max_iterations</td><td>int</td><td>coder_node / main.py</td><td>Current and max loop count</td></tr>
-      <tr><td>pass_threshold</td><td>float</td><td>main.py</td><td>Minimum pass rate to stop (0.0–1.0)</td></tr>
-      <tr><td>total_tokens</td><td>int</td><td>all nodes</td><td>Cumulative LLM tokens (API cost proxy)</td></tr>
-      <tr><td>history</td><td>list</td><td>reviewer_node</td><td>Per-iteration snapshot for analysis</td></tr>
-    </tbody>
-  </table>
+
+  <div class="good">
+    <strong>Status (2026-05-09):</strong>
+    All four agents are fully implemented with real LLM calls.
+    HumanEval tests are automatically adapted to pytest format.
+    Single-agent baseline is complete.
+    11/11 unit tests pass without an API key.
+    The system is ready to run — only a valid API key is required.
+  </div>
+
+  <hr />
+
+  <h2>Key Research Question</h2>
+  <p>
+    <em>When and why does a multi-agent feedback loop outperform a single-shot LLM call?</em>
+  </p>
+  <ul>
+    <li>On <strong>easy problems</strong> the single agent often solves them first try — cheaper.</li>
+    <li>On <strong>harder problems</strong> the feedback loop catches bugs and iterates to a correct solution.</li>
+    <li>The report should quantify this trade-off: quality improvement vs. token cost.</li>
+  </ul>
+
+  <hr />
+
+  <h2>Codebase at a Glance</h2>
+  <div class="file-tree">
+<span class="ft-dir">Intelligent_Agent_Systems_LLMs/</span>
+├── <span class="ft-dir">agents/</span>
+│   ├── base_agent.py         <span class="ft-comment"># AgentResult, AgentMessage, BaseAgent ABC</span>
+│   ├── planner_agent.py      <span class="ft-done"># ✓ LLM: turns problem → numbered plan</span>
+│   ├── coder_agent.py        <span class="ft-done"># ✓ LLM: plan + feedback → Python code</span>
+│   ├── tester_agent.py       <span class="ft-done"># ✓ Subprocess pytest, no LLM</span>
+│   ├── reviewer_agent.py     <span class="ft-done"># ✓ LLM: code + results → APPROVED / issues</span>
+│   └── single_agent.py       <span class="ft-new"># ✓ NEW: single-shot baseline agent</span>
+├── <span class="ft-dir">graph/</span>
+│   ├── state.py              <span class="ft-comment"># AgentState TypedDict</span>
+│   ├── nodes.py              <span class="ft-comment"># LangGraph node functions</span>
+│   └── pipeline.py           <span class="ft-comment"># build_graph() — compiles StateGraph</span>
+├── <span class="ft-dir">benchmarks/</span>
+│   └── humaneval.py          <span class="ft-done"># ✓ Loader + HumanEval→pytest test adapter</span>
+├── <span class="ft-dir">utils/</span>
+│   ├── metrics.py            <span class="ft-comment"># MetricsCollector, AggregateMetrics</span>
+│   └── llm_client.py         <span class="ft-new"># ✓ NEW: get_llm() factory, token counter</span>
+├── <span class="ft-dir">orchestration/</span>
+│   └── orchestrator.py       <span class="ft-comment"># Manual loop (non-LangGraph reference impl)</span>
+├── <span class="ft-dir">tests/</span>                    <span class="ft-comment"># 11 unit tests — all pass without API key</span>
+├── <span class="ft-dir">data/</span>
+│   └── HumanEval.jsonl       <span class="ft-comment"># 164 HumanEval problems</span>
+└── main.py                   <span class="ft-done"># ✓ CLI entry: --mode multi|single</span>
+  </div>
 
 </div>
 
-<!-- ═══════════════════════════════════════════ TAB 2 — AGENTS ════════════ -->
-<div id="tab-agents" class="tab-panel">
+<!-- ═══════════════ TAB 2 — ARCHITECTURE ════════════════════════════════════ -->
+<div id="tab-arch" class="tab-panel">
 
-  <h2>The Four Agents</h2>
-  <div class="agent-grid">
-    <div class="acard">
-      <span class="badge b-blue">Planner</span>
-      <h4>PlannerAgent</h4>
-      <p>Receives the raw problem description. Returns a numbered, step-by-step plan: data structures to use, algorithm choice, edge cases to handle. Called <strong>once per problem</strong> before the loop starts.</p>
-    </div>
-    <div class="acard">
-      <span class="badge b-green">Coder</span>
-      <h4>CoderAgent</h4>
-      <p>Receives the plan + optional test failure output + reviewer feedback. Returns a complete Python function. Called on <strong>every iteration</strong> of the feedback loop.</p>
-    </div>
-    <div class="acard">
-      <span class="badge b-yellow">Tester</span>
-      <h4>TesterAgent</h4>
-      <p>Writes the generated code and HumanEval's <code>check()</code> function to a temp directory. Runs <code>python -m pytest</code> in a subprocess. <strong>No LLM call</strong> — pure local execution. Returns pass/fail counts.</p>
-    </div>
-    <div class="acard">
-      <span class="badge b-purple">Reviewer</span>
-      <h4>ReviewerAgent</h4>
-      <p>Reads the code, the plan, and the test result. Provides feedback on correctness, missing edge cases, and style. Returns <strong>APPROVED</strong> when the solution is acceptable.</p>
-    </div>
-  </div>
+  <h2>Multi-Agent Pipeline (LangGraph)</h2>
+  <p>
+    The system is built as a <strong>LangGraph StateGraph</strong>.
+    Each agent is a node; edges define the flow; a conditional edge implements the feedback loop.
+  </p>
 
-  <div class="info">
-    <strong>Key insight — TesterAgent is different.</strong> The other three agents call an LLM.
-    TesterAgent runs a subprocess. This means it is deterministic, fast, and has zero token cost.
-    The feedback it sends to CoderAgent (the raw pytest output) is far more precise than anything
-    an LLM could invent about test results.
+  <div class="flow">
+    <div class="fbox entry">START</div>
+    <span class="farr">→</span>
+    <div class="fbox">Planner</div>
+    <span class="farr">→</span>
+    <div class="fbox">Coder</div>
+    <span class="farr">→</span>
+    <div class="fbox">Tester</div>
+    <span class="farr">→</span>
+    <div class="fbox">Reviewer</div>
+    <span class="farr">→</span>
+    <span class="floop">pass? or max iters?</span>
+    <span class="farr">→</span>
+    <div class="fbox end">END</div>
   </div>
+  <p style="font-size:.8rem;color:#64748b;margin-top:4px">
+    Reviewer → Coder loop repeats until <code>pass_rate ≥ pass_threshold</code>
+    or <code>iteration ≥ max_iterations</code>.
+  </p>
 
   <hr />
 
-  <h2>BaseAgent Contract</h2>
-  <p>All four agents inherit from <code>BaseAgent</code> and must implement one method:</p>
-  <div class="cb">
-<span class="kw">class</span> <span class="cls">BaseAgent</span>(ABC):<br />
-&nbsp;&nbsp;<span class="kw">def</span> <span class="fn">__init__</span>(self, name, model, system_prompt): ...<br />
-<br />
-&nbsp;&nbsp;<span class="kw">@abstractmethod</span><br />
-&nbsp;&nbsp;<span class="kw">def</span> <span class="fn">run</span>(self, task: str, context: dict | None) -> <span class="cls">AgentResult</span>:<br />
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt">"""Call the LLM, return a structured AgentResult."""</span><br />
-&nbsp;&nbsp;&nbsp;&nbsp;...
-  </div>
-  <p><code>AgentResult</code> carries: <code>output</code> (text), <code>success</code> (bool), <code>tokens_used</code> (int), <code>metadata</code> (dict).</p>
+  <h2>Shared State (AgentState TypedDict)</h2>
+  <p>
+    All nodes read from and write to a single immutable-style state dict.
+    LangGraph merges the returned partial dict into the current state after each node.
+  </p>
+
+  <table>
+    <thead><tr><th>Field</th><th>Type</th><th>Set By</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>problem_id</code></td><td>str</td><td>main.py</td><td>Identifier like <code>HumanEval/0</code></td></tr>
+      <tr><td><code>problem_description</code></td><td>str</td><td>main.py</td><td>Function signature + docstring from HumanEval</td></tr>
+      <tr><td><code>tests</code></td><td>str</td><td>main.py</td><td>pytest-ready test file (adapted from HumanEval)</td></tr>
+      <tr><td><code>plan</code></td><td>str</td><td>PlannerAgent</td><td>Numbered implementation strategy</td></tr>
+      <tr><td><code>code</code></td><td>str</td><td>CoderAgent</td><td>Latest generated Python code</td></tr>
+      <tr><td><code>test_output</code></td><td>str</td><td>TesterAgent</td><td>Raw pytest stdout/stderr</td></tr>
+      <tr><td><code>test_passed / failed / errors</code></td><td>int</td><td>TesterAgent</td><td>Counts from pytest output</td></tr>
+      <tr><td><code>review</code></td><td>str</td><td>ReviewerAgent</td><td>APPROVED or list of issues</td></tr>
+      <tr><td><code>approved</code></td><td>bool</td><td>ReviewerAgent</td><td>True when review contains APPROVED</td></tr>
+      <tr><td><code>iteration</code></td><td>int</td><td>CoderAgent node</td><td>Current loop iteration (1-based)</td></tr>
+      <tr><td><code>max_iterations</code></td><td>int</td><td>main.py</td><td>Hard stop for the feedback loop</td></tr>
+      <tr><td><code>pass_threshold</code></td><td>float</td><td>main.py</td><td>Fraction of tests that must pass to stop early (default 1.0)</td></tr>
+      <tr><td><code>total_tokens</code></td><td>int</td><td>LLM nodes</td><td>Running token counter across all agents</td></tr>
+      <tr><td><code>history</code></td><td>list[dict]</td><td>ReviewerAgent node</td><td>Per-iteration snapshot: code, pass_rate, review, tokens</td></tr>
+    </tbody>
+  </table>
 
   <hr />
 
-  <h2>LangGraph — Three Key Files</h2>
+  <h2>Stopping Conditions (<code>graph/nodes.py:should_continue</code>)</h2>
+  <div class="cb"><span class="kw">def</span> <span class="fn">should_continue</span>(state):
+    total = state[<span class="str">"test_passed"</span>] + state[<span class="str">"test_failed"</span>] + state[<span class="str">"test_errors"</span>]
+    pass_rate = state[<span class="str">"test_passed"</span>] / total <span class="kw">if</span> total > <span class="str">0</span> <span class="kw">else</span> <span class="str">0.0</span>
 
-  <h3>graph/state.py — AgentState TypedDict</h3>
-  <p>
-    Defines the shape of the shared state dict. LangGraph enforces that every node
-    receives and returns this exact structure. Nothing lives outside it during a run.
-  </p>
-  <div class="cb">
-<span class="kw">from</span> typing <span class="kw">import</span> TypedDict<br />
-<br />
-<span class="kw">class</span> <span class="cls">AgentState</span>(TypedDict):<br />
-&nbsp;&nbsp;problem_id: str<br />
-&nbsp;&nbsp;problem_description: str<br />
-&nbsp;&nbsp;plan: str<br />
-&nbsp;&nbsp;code: str<br />
-&nbsp;&nbsp;test_passed: int<br />
-&nbsp;&nbsp;iteration: int<br />
-&nbsp;&nbsp;... <span class="cmt"># full list in state.py</span>
-  </div>
+    <span class="kw">if</span> pass_rate >= state[<span class="str">"pass_threshold"</span>]:
+        <span class="kw">return</span> <span class="str">"end"</span>   <span class="cmt"># all tests pass → done</span>
 
-  <h3>graph/nodes.py — Node functions</h3>
-  <p>
-    Each node is a plain Python function: <code>(AgentState) → AgentState</code>.
-    It calls the relevant agent, updates the state fields it owns, and returns the new state.
-  </p>
-  <div class="cb">
-<span class="kw">def</span> <span class="fn">coder_node</span>(state: <span class="cls">AgentState</span>) -> <span class="cls">AgentState</span>:<br />
-&nbsp;&nbsp;result = _coder.run(<br />
-&nbsp;&nbsp;&nbsp;&nbsp;task=state[<span class="str">"problem_description"</span>],<br />
-&nbsp;&nbsp;&nbsp;&nbsp;context={<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"plan"</span>:          state[<span class="str">"plan"</span>],<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"previous_code"</span>: state[<span class="str">"code"</span>],<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="str">"test_feedback"</span>: state[<span class="str">"test_output"</span>],<br />
-&nbsp;&nbsp;&nbsp;&nbsp;}<br />
-&nbsp;&nbsp;)<br />
-&nbsp;&nbsp;<span class="kw">return</span> {**state, <span class="str">"code"</span>: result.output, <span class="str">"iteration"</span>: state[<span class="str">"iteration"</span>] + <span class="str">1</span>}
-  </div>
+    <span class="kw">if</span> state[<span class="str">"iteration"</span>] >= state[<span class="str">"max_iterations"</span>]:
+        <span class="kw">return</span> <span class="str">"end"</span>   <span class="cmt"># budget exhausted → done</span>
 
-  <h3>graph/pipeline.py — build_graph()</h3>
-  <p>
-    Creates a <code>StateGraph</code>, registers all four nodes, adds edges,
-    and adds the <strong>conditional edge</strong> that loops back or ends the graph.
-  </p>
-  <div class="cb">
-workflow = <span class="cls">StateGraph</span>(<span class="cls">AgentState</span>)<br />
-<br />
-workflow.add_node(<span class="str">"planner"</span>,  planner_node)<br />
-workflow.add_node(<span class="str">"coder"</span>,    coder_node)<br />
-workflow.add_node(<span class="str">"tester"</span>,   tester_node)<br />
-workflow.add_node(<span class="str">"reviewer"</span>, reviewer_node)<br />
-<br />
-workflow.set_entry_point(<span class="str">"planner"</span>)<br />
-workflow.add_edge(<span class="str">"planner"</span>, <span class="str">"coder"</span>)<br />
-workflow.add_edge(<span class="str">"coder"</span>,   <span class="str">"tester"</span>)<br />
-workflow.add_edge(<span class="str">"tester"</span>,  <span class="str">"reviewer"</span>)<br />
-<br />
-workflow.add_conditional_edges(<br />
-&nbsp;&nbsp;<span class="str">"reviewer"</span>, should_continue,<br />
-&nbsp;&nbsp;{<span class="str">"continue"</span>: <span class="str">"coder"</span>, <span class="str">"end"</span>: END}<br />
-)<br />
-<br />
-graph = workflow.compile()
-  </div>
+    <span class="kw">return</span> <span class="str">"continue"</span>  <span class="cmt"># loop back to CoderAgent</span></div>
 
   <hr />
-
-  <h2>TesterAgent — How the Subprocess Works</h2>
-  <p>
-    HumanEval provides a <code>check(candidate)</code> function that asserts against the correct answer.
-    TesterAgent wraps it in a pytest test and runs it in isolation:
-  </p>
-  <div class="cb">
-<span class="cmt"># /tmp/xyz/solution.py  ← CoderAgent's output</span><br />
-<span class="kw">def</span> <span class="fn">has_close_elements</span>(numbers, threshold):<br />
-&nbsp;&nbsp;<span class="kw">return</span> any(abs(a-b) &lt; threshold <span class="kw">for</span> i,a <span class="kw">in</span> enumerate(numbers)<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span> b <span class="kw">in</span> numbers[i+<span class="str">1</span>:])<br />
-<br />
-<span class="cmt"># /tmp/xyz/test_solution.py  ← HumanEval's check() + pytest wrapper</span><br />
-<span class="kw">from</span> solution <span class="kw">import</span> has_close_elements<br />
-<span class="kw">def</span> <span class="fn">test_check</span>():<br />
-&nbsp;&nbsp;check(has_close_elements)<br />
-<br />
-<span class="cmt"># TesterAgent runs:</span><br />
-python -m pytest test_solution.py -v --tb=short
-  </div>
 
   <h2>Single-Agent Baseline</h2>
   <p>
-    The exercise requires a comparison with a single agent. This is just a stripped-down
-    version that skips the planning and review steps — CoderAgent generates code once,
-    TesterAgent runs once, no loop.
-    Add a <code>--mode single|multi</code> flag to <code>main.py</code> to switch between them.
+    The baseline is a deliberately minimal version: <strong>one LLM call, one test run, no loop</strong>.
+    It uses the same benchmark, model, and TesterAgent so results are directly comparable.
+  </p>
+  <div class="flow">
+    <div class="fbox entry">Problem</div>
+    <span class="farr">→</span>
+    <div class="fbox">SingleAgent (LLM)</div>
+    <span class="farr">→</span>
+    <div class="fbox">TesterAgent</div>
+    <span class="farr">→</span>
+    <div class="fbox end">Results</div>
+  </div>
+
+  <hr />
+
+  <h2>LLM Provider Selection (<code>utils/llm_client.py</code>)</h2>
+  <p>
+    The <code>get_llm(model)</code> function transparently returns the right LangChain client:
+    <code>ChatAnthropic</code> when the model name starts with <code>claude-</code>,
+    <code>ChatOpenAI</code> for everything else. Both providers are in the Pipfile.
+  </p>
+  <div class="cb"><span class="kw">def</span> <span class="fn">get_llm</span>(model: str):
+    <span class="kw">if</span> model.startswith(<span class="str">"claude"</span>):
+        <span class="kw">from</span> langchain_anthropic <span class="kw">import</span> <span class="cls">ChatAnthropic</span>
+        <span class="kw">return</span> <span class="cls">ChatAnthropic</span>(model=model, temperature=<span class="str">0</span>)
+    <span class="kw">from</span> langchain_openai <span class="kw">import</span> <span class="cls">ChatOpenAI</span>
+    <span class="kw">return</span> <span class="cls">ChatOpenAI</span>(model=model, temperature=<span class="str">0</span>)</div>
+  <p>All three LLM agents also wrap their <code>run()</code> with a <strong>tenacity retry</strong>
+  (<code>wait_exponential min=4 max=60, 3 attempts</code>) to handle API rate limits gracefully.</p>
+
+</div>
+
+<!-- ═══════════════ TAB 3 — AGENTS ══════════════════════════════════════════ -->
+<div id="tab-agents" class="tab-panel">
+
+  <h2>Agent Roles and Responsibilities</h2>
+
+  <div class="card-grid" style="grid-template-columns:1fr">
+    <div class="card">
+      <span class="badge b-green">LLM Agent</span>
+      <h4>PlannerAgent — <code>agents/planner_agent.py</code></h4>
+      <p><strong>Input:</strong> problem description (function signature + docstring)<br>
+         <strong>Output:</strong> numbered step-by-step implementation plan (no code)<br>
+         <strong>Prompt strategy:</strong> system prompt instructs it to focus on algorithm choice,
+         data structures, and edge cases — explicitly told NOT to write code.<br>
+         <strong>State field written:</strong> <code>plan</code></p>
+    </div>
+  </div>
+
+  <div class="card-grid" style="grid-template-columns:1fr">
+    <div class="card">
+      <span class="badge b-green">LLM Agent</span>
+      <h4>CoderAgent — <code>agents/coder_agent.py</code></h4>
+      <p><strong>Input:</strong> problem description, plan, (on retries) previous code + test output + review<br>
+         <strong>Output:</strong> clean Python code inside a <code>```python``` fence</code><br>
+         <strong>Code extraction:</strong> <code>_extract_code()</code> strips the markdown fence.
+         Falls back to raw text if no fence is found.<br>
+         <strong>Retry awareness:</strong> on iteration 2+ the prompt includes the previous code,
+         failing test output, and reviewer feedback — giving the model all context needed to fix bugs.<br>
+         <strong>State field written:</strong> <code>code</code>, <code>iteration</code></p>
+    </div>
+  </div>
+
+  <div class="card-grid" style="grid-template-columns:1fr">
+    <div class="card">
+      <span class="badge b-blue">No LLM — Deterministic</span>
+      <h4>TesterAgent — <code>agents/tester_agent.py</code></h4>
+      <p><strong>Input:</strong> generated Python code + pytest-ready test file<br>
+         <strong>Output:</strong> passed/failed/error counts + raw pytest output<br>
+         <strong>Mechanism:</strong> writes code as <code>solution.py</code> and tests as
+         <code>test_solution.py</code> to a <code>tempfile.TemporaryDirectory()</code>,
+         runs <code>python -m pytest … --tb=short</code> in a subprocess,
+         parses <code> PASSED</code> / <code> FAILED</code> / <code> ERROR</code> counts
+         from stdout+stderr. Timeout: 30 seconds. Zero LLM cost.<br>
+         <strong>State fields written:</strong> <code>test_output</code>, <code>test_passed</code>,
+         <code>test_failed</code>, <code>test_errors</code></p>
+    </div>
+  </div>
+
+  <div class="card-grid" style="grid-template-columns:1fr">
+    <div class="card">
+      <span class="badge b-green">LLM Agent</span>
+      <h4>ReviewerAgent — <code>agents/reviewer_agent.py</code></h4>
+      <p><strong>Input:</strong> problem, plan, code, test results (passed/total + raw output)<br>
+         <strong>Output:</strong> either the single word <code>APPROVED</code> or a short,
+         actionable bullet list of specific bugs to fix.<br>
+         <strong>Approved detection:</strong> <code>"APPROVED" in result.output.upper()</code> —
+         case-insensitive so model variations don't cause false negatives.<br>
+         <strong>Design note:</strong> the reviewer is instructed NOT to rewrite code.
+         It is a critic, not a fixer. Fixes happen in the next CoderAgent iteration.<br>
+         <strong>State fields written:</strong> <code>review</code>, <code>approved</code>,
+         <code>history</code> entry</p>
+    </div>
+  </div>
+
+  <div class="card-grid" style="grid-template-columns:1fr">
+    <div class="card">
+      <span class="badge b-blue">Baseline — No Loop</span>
+      <h4>SingleAgent — <code>agents/single_agent.py</code></h4>
+      <p><strong>Input:</strong> problem description only (no plan, no feedback)<br>
+         <strong>Output:</strong> Python code (same fence extraction as CoderAgent)<br>
+         <strong>Purpose:</strong> provides the comparison baseline required by the assignment.
+         Uses the same model, TesterAgent, and benchmark so all metrics are comparable.<br>
+         <strong>Used by:</strong> <code>run_single_agent()</code> in <code>main.py</code>
+         when <code>--mode single</code> is passed.</p>
+    </div>
+  </div>
+
+  <hr />
+
+  <h2>How Tests Are Adapted for TesterAgent</h2>
+  <p>
+    HumanEval's built-in tests use a <code>check(candidate)</code> convention — not pytest.
+    The benchmark loader (<code>benchmarks/humaneval.py:_adapt_tests_to_pytest()</code>)
+    converts them automatically when loading the JSONL file:
+  </p>
+  <div class="cb"><span class="cmt"># HumanEval raw "test" field:</span>
+<span class="kw">def</span> <span class="fn">check</span>(candidate):
+    assert candidate([<span class="str">1.0</span>, <span class="str">2.0</span>, <span class="str">3.9</span>], <span class="str">0.3</span>) == <span class="cls">True</span>
+    assert candidate([<span class="str">1.0</span>, <span class="str">2.0</span>], <span class="str">0.5</span>) == <span class="cls">False</span>
+
+<span class="cmt"># After _adapt_tests_to_pytest(raw_test, entry_point="has_close_elements"):</span>
+<span class="kw">from</span> solution <span class="kw">import</span> has_close_elements   <span class="cmt"># imports the generated solution</span>
+
+<span class="kw">def</span> <span class="fn">check</span>(candidate):
+    assert candidate([<span class="str">1.0</span>, <span class="str">2.0</span>, <span class="str">3.9</span>], <span class="str">0.3</span>) == <span class="cls">True</span>
+    assert candidate([<span class="str">1.0</span>, <span class="str">2.0</span>], <span class="str">0.5</span>) == <span class="cls">False</span>
+
+<span class="kw">def</span> <span class="fn">test_check</span>():              <span class="cmt"># pytest discovers and runs this</span>
+    check(has_close_elements)   <span class="cmt"># passes the generated function to the checker</span></div>
+
+  <p>
+    The <code>entry_point</code> field from the JSONL (e.g. <code>has_close_elements</code>)
+    is used both in the import statement and in the <code>test_check()</code> call.
+    This means TesterAgent runs the <strong>exact official HumanEval checks</strong> against
+    the code generated by CoderAgent — problem-specific, not generic tests.
   </p>
 
 </div>
 
-<!-- ═══════════════════════════════════════════ TAB 3 — LIBRARIES ═════════ -->
-<div id="tab-libs" class="tab-panel">
+<!-- ═══════════════ TAB 4 — DATA FLOW ═══════════════════════════════════════ -->
+<div id="tab-data" class="tab-panel">
 
-  <h2>Core Libraries</h2>
-  <div class="lib-grid">
+  <h2>End-to-End Data Flow (Multi-Agent Mode)</h2>
 
-    <div class="lcard">
-      <div class="lname">langgraph <span class="lver">≥ 0.2</span></div>
-      <p>The orchestration engine. Provides <code>StateGraph</code>, node registration,
-      edge definitions, and conditional routing. Compiles the graph into a runnable object
-      with a simple <code>.invoke(state)</code> interface.</p>
-      <span class="ltag lt-core">Core</span>
-    </div>
+  <ol style="padding-left:20px;line-height:2.2">
+    <li><strong>main.py</strong> loads <code>data/HumanEval.jsonl</code> via
+    <code>HumanEvalBenchmark</code>. Each <code>Problem</code> has: <code>problem_id</code>,
+    <code>description</code> (prompt), <code>entry_point</code>, <code>canonical_solution</code>,
+    and <code>tests</code> (already adapted to pytest format).</li>
 
-    <div class="lcard">
-      <div class="lname">langchain-core</div>
-      <p>Base message types (<code>HumanMessage</code>, <code>AIMessage</code>,
-      <code>SystemMessage</code>) and the <code>Runnable</code> protocol that LangGraph builds on.
-      Required as a transitive dependency of LangGraph.</p>
-      <span class="ltag lt-core">Core</span>
-    </div>
+    <li><strong>main.py</strong> initialises <code>AgentState</code> with problem fields,
+    empty agent outputs, <code>iteration=0</code>, and run config, then calls
+    <code>graph.invoke(initial_state)</code>.</li>
 
-    <div class="lcard">
-      <div class="lname">langchain-openai</div>
-      <p>LangChain wrapper for OpenAI's API. Provides <code>ChatOpenAI</code> which each agent
-      uses to send messages and get responses. Handles retries, streaming, and response parsing.</p>
-      <span class="ltag lt-llm">LLM</span>
-    </div>
+    <li><strong>PlannerAgent node</strong> sends the problem description to the LLM.
+    The response is a plain-text numbered plan. State <code>plan</code> is updated;
+    tokens counted.</li>
 
-    <div class="lcard">
-      <div class="lname">langchain-anthropic</div>
-      <p>Same as above but for Anthropic Claude. Drop-in replacement for <code>ChatOpenAI</code>
-      — swap the class name and the model string, nothing else changes.</p>
-      <span class="ltag lt-llm">LLM</span>
-    </div>
+    <li><strong>CoderAgent node</strong> builds a structured prompt from:
+    problem description + plan (+ previous code and feedback on retries).
+    The LLM returns code in a <code>```python``` fence</code>.
+    Code is extracted, stored in <code>state["code"]</code>; iteration counter incremented.</li>
 
-    <div class="lcard">
-      <div class="lname">openai</div>
-      <p>Official OpenAI Python SDK. Used directly inside agent <code>run()</code> methods
-      if you prefer the raw SDK over LangChain's wrapper. Also needed for token counting
-      via <code>tiktoken</code>.</p>
-      <span class="ltag lt-llm">LLM</span>
-    </div>
+    <li><strong>TesterAgent node</strong> writes <code>solution.py</code> (the code) and
+    <code>test_solution.py</code> (the adapted HumanEval tests) to a temp directory.
+    Runs pytest via subprocess. Parses PASSED/FAILED/ERROR counts from output.
+    Updates <code>test_passed / test_failed / test_errors / test_output</code>.</li>
 
-    <div class="lcard">
-      <div class="lname">anthropic</div>
-      <p>Official Anthropic Python SDK. Alternative to <code>langchain-anthropic</code> for
-      direct API calls to Claude. Useful if you want fine-grained control over messages.</p>
-      <span class="ltag lt-llm">LLM</span>
-    </div>
+    <li><strong>ReviewerAgent node</strong> sends problem + plan + code + test summary to LLM.
+    Writes review to state. Sets <code>approved=True</code> if "APPROVED" in response.
+    Appends a history snapshot (code, pass_rate, review, tokens) to <code>state["history"]</code>.</li>
 
-    <div class="lcard">
-      <div class="lname">pydantic <span class="lver">≥ 2.0</span></div>
-      <p>Data validation for agent inputs and outputs. Used to validate <code>AgentResult</code>
-      and <code>RunConfig</code>. LangGraph also uses Pydantic internally for state validation.</p>
-      <span class="ltag lt-core">Core</span>
-    </div>
+    <li><strong>should_continue()</strong> edge: if <code>pass_rate ≥ pass_threshold</code>
+    or <code>iteration ≥ max_iterations</code> → END. Otherwise → back to CoderAgent (step 4).</li>
 
-    <div class="lcard">
-      <div class="lname">python-dotenv</div>
-      <p>Loads <code>OPENAI_API_KEY</code> / <code>ANTHROPIC_API_KEY</code> from a local
-      <code>.env</code> file into environment variables. Called once at the top of
-      <code>main.py</code> with <code>load_dotenv()</code>.</p>
-      <span class="ltag lt-util">Utility</span>
-    </div>
+    <li><strong>main.py</strong> receives final state, passes it to
+    <code>MetricsCollector.add_from_state()</code>, then moves to the next problem.</li>
 
-    <div class="lcard">
-      <div class="lname">loguru</div>
-      <p>Structured, colour-coded logging with zero configuration.
-      Replaces Python's built-in <code>logging</code> module.
-      Used to log which agent is running, test results, and iteration counts.</p>
-      <span class="ltag lt-util">Utility</span>
-    </div>
-
-    <div class="lcard">
-      <div class="lname">tiktoken</div>
-      <p>OpenAI's token counter. Used to count how many tokens each LLM call consumes
-      <em>before</em> making the API request — important for the cost analysis
-      section of the report.</p>
-      <span class="ltag lt-util">Utility</span>
-    </div>
-
-    <div class="lcard">
-      <div class="lname">tenacity</div>
-      <p>Retry logic with exponential back-off. Wraps LLM API calls so that
-      transient rate-limit errors (<code>429</code>) are automatically retried
-      without crashing the benchmark run.</p>
-      <span class="ltag lt-util">Utility</span>
-    </div>
-
-    <div class="lcard">
-      <div class="lname">pytest <span class="lver">dev</span></div>
-      <p>Two roles: (1) your unit test runner for the <code>tests/</code> folder,
-      and (2) the tool TesterAgent invokes in a subprocess against generated code.
-      Both roles use the same binary: <code>python -m pytest</code>.</p>
-      <span class="ltag lt-dev">Dev</span>
-    </div>
-
-    <div class="lcard">
-      <div class="lname">pytest-mock <span class="lver">dev</span></div>
-      <p>Provides <code>mocker.patch()</code> fixtures. Used in integration tests to
-      replace real LLM API calls with mocked responses — so you can test the full
-      agent pipeline without spending API credits.</p>
-      <span class="ltag lt-dev">Dev</span>
-    </div>
-
-    <div class="lcard">
-      <div class="lname">pytest-asyncio <span class="lver">dev</span></div>
-      <p>Adds <code>@pytest.mark.asyncio</code> support. Needed if you later implement
-      async LLM calls (e.g. streaming responses from the OpenAI or Anthropic SDK).</p>
-      <span class="ltag lt-dev">Dev</span>
-    </div>
-
-  </div>
-
-  <hr />
-
-  <h2>Technology Stack Summary</h2>
-  <table>
-    <thead><tr><th>Layer</th><th>Technology</th><th>Why this choice</th></tr></thead>
-    <tbody>
-      <tr><td>Language</td><td>Python 3.11</td><td>Native support for TypedDict, match statements, and all AI/ML libraries</td></tr>
-      <tr><td>Agent orchestration</td><td>LangGraph ≥ 0.2</td><td>State machine with typed shared state, conditional edges, built-in loop support</td></tr>
-      <tr><td>LLM provider (primary)</td><td>OpenAI GPT-4o</td><td>Best cost/quality ratio for code generation at scale</td></tr>
-      <tr><td>LLM provider (alternative)</td><td>Anthropic Claude</td><td>Drop-in alternative; Claude Sonnet is strong at code tasks</td></tr>
-      <tr><td>Test execution</td><td>pytest (subprocess)</td><td>HumanEval tests are Python assertions — natural fit, zero conversion needed</td></tr>
-      <tr><td>Benchmark dataset</td><td>HumanEval (164 problems)</td><td>Standard, peer-reviewed dataset with canonical solutions and test suites</td></tr>
-      <tr><td>Dependency management</td><td>Pipenv</td><td>Pipfile separates runtime from dev dependencies</td></tr>
-    </tbody>
-  </table>
-
-  <hr />
-
-  <h2>Install Everything</h2>
-  <div class="cb">
-<span class="cmt"># 1 — install pipenv if you don't have it</span><br />
-pip install pipenv<br />
-<br />
-<span class="cmt"># 2 — install all runtime + dev dependencies</span><br />
-pipenv install --dev<br />
-<br />
-<span class="cmt"># 3 — activate the virtual environment</span><br />
-pipenv shell<br />
-<br />
-<span class="cmt"># 4 — verify LangGraph is available</span><br />
-python -c <span class="str">"import langgraph; print(langgraph.__version__)"</span>
-  </div>
-
-</div>
-
-<!-- ═══════════════════════════════════════════ TAB 4 — STEPS ════════════ -->
-<div id="tab-steps" class="tab-panel">
-
-  <h2>Step-by-Step Build Guide</h2>
-
-  <ol class="steps">
-
-    <li>
-      <span class="snum">1</span>
-      <div class="sbody">
-        <strong>Set up environment &amp; API keys</strong>
-        <p>Copy <code>.env.example</code> to <code>.env</code> and fill in your key.
-        Run <code>pipenv install --dev</code>. Verify with
-        <code>python -c "import langgraph"</code>.</p>
-        <div class="cb">
-cp .env.example .env<br />
-<span class="cmt"># edit .env and set OPENAI_API_KEY=sk-...</span><br />
-pipenv install --dev<br />
-pipenv shell
-        </div>
-      </div>
-    </li>
-
-    <li>
-      <span class="snum">2</span>
-      <div class="sbody">
-        <strong>Run existing unit tests — they should pass without any API key</strong>
-        <p>The three test files in <code>tests/</code> verify the subprocess sandbox,
-        the graph stopping logic, and the benchmark loader. These are the first
-        confidence check before touching any LLM code.</p>
-        <div class="cb">
-pytest tests/ -v<br />
-<span class="cmt"># Expected: 8 passed, 0 failed</span>
-        </div>
-      </div>
-    </li>
-
-    <li>
-      <span class="snum">3</span>
-      <div class="sbody">
-        <strong>Implement <code>run()</code> in PlannerAgent</strong>
-        <p>Open <code>agents/planner_agent.py</code>. Replace <code>raise NotImplementedError</code>
-        with an LLM call. Use <code>ChatOpenAI</code> from <code>langchain-openai</code>.
-        Return an <code>AgentResult</code> with the plan text and token count.</p>
-        <div class="cb">
-<span class="kw">from</span> langchain_openai <span class="kw">import</span> <span class="cls">ChatOpenAI</span><br />
-<span class="kw">from</span> langchain_core.messages <span class="kw">import</span> <span class="cls">SystemMessage</span>, <span class="cls">HumanMessage</span><br />
-<br />
-<span class="kw">def</span> <span class="fn">run</span>(self, task, context=None):<br />
-&nbsp;&nbsp;llm = <span class="cls">ChatOpenAI</span>(model=self.model)<br />
-&nbsp;&nbsp;response = llm.invoke([<br />
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="cls">SystemMessage</span>(content=self.system_prompt),<br />
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="cls">HumanMessage</span>(content=task),<br />
-&nbsp;&nbsp;])<br />
-&nbsp;&nbsp;<span class="kw">return</span> <span class="cls">AgentResult</span>(<br />
-&nbsp;&nbsp;&nbsp;&nbsp;agent_name=self.name,<br />
-&nbsp;&nbsp;&nbsp;&nbsp;output=response.content,<br />
-&nbsp;&nbsp;&nbsp;&nbsp;success=<span class="cls">True</span>,<br />
-&nbsp;&nbsp;&nbsp;&nbsp;tokens_used=response.usage_metadata[<span class="str">"total_tokens"</span>],<br />
-&nbsp;&nbsp;)
-        </div>
-      </div>
-    </li>
-
-    <li>
-      <span class="snum">4</span>
-      <div class="sbody">
-        <strong>Implement <code>run()</code> in CoderAgent</strong>
-        <p>Same pattern as PlannerAgent but the prompt includes
-        <code>context["plan"]</code>, <code>context["previous_code"]</code>, and
-        <code>context["test_feedback"]</code>. The system prompt instructs the LLM
-        to return only the code block.</p>
-      </div>
-    </li>
-
-    <li>
-      <span class="snum">5</span>
-      <div class="sbody">
-        <strong>Implement <code>run()</code> in ReviewerAgent</strong>
-        <p>The prompt passes the generated code + test result summary.
-        The system prompt instructs the LLM to return <strong>APPROVED</strong>
-        if the solution is correct, otherwise list specific issues.</p>
-      </div>
-    </li>
-
-    <li>
-      <span class="snum">6</span>
-      <div class="sbody">
-        <strong>Download HumanEval dataset</strong>
-        <p>Place the JSONL file at <code>data/humaneval.jsonl</code>.
-        Each line is one problem with <code>prompt</code>, <code>canonical_solution</code>,
-        and <code>test</code> fields.</p>
-        <div class="cb">
-pip install human-eval<br />
-<span class="cmt"># or clone: git clone https://github.com/openai/human-eval</span><br />
-<span class="cmt"># copy HumanEval.jsonl (after gunzip) to data/humaneval.jsonl</span>
-        </div>
-      </div>
-    </li>
-
-    <li>
-      <span class="snum">7</span>
-      <div class="sbody">
-        <strong>Run a smoke test on 3 problems</strong>
-        <p>Verify the full pipeline end-to-end before a full benchmark run.
-        Use <code>--max-iterations 2</code> to keep costs low.</p>
-        <div class="cb">
-python main.py \<br />
-&nbsp;&nbsp;--benchmark data/humaneval.jsonl \<br />
-&nbsp;&nbsp;--max-problems 3 \<br />
-&nbsp;&nbsp;--max-iterations 2 \<br />
-&nbsp;&nbsp;--model gpt-4o \<br />
-&nbsp;&nbsp;--output results/smoke.json
-        </div>
-      </div>
-    </li>
-
-    <li>
-      <span class="snum">8</span>
-      <div class="sbody">
-        <strong>Add single-agent baseline mode</strong>
-        <p>Add <code>--mode single|multi</code> to <code>main.py</code>.
-        In single mode, skip the planner and reviewer; CoderAgent runs once,
-        TesterAgent runs once, no loop. Same benchmark, same problems.</p>
-      </div>
-    </li>
-
-    <li>
-      <span class="snum">9</span>
-      <div class="sbody">
-        <strong>Run full benchmark (20–30 problems)</strong>
-        <p>Run both modes on the same subset and save separate result files.
-        Use a small subset to control API cost — 20 problems × 5 iterations × 4 agents
-        is roughly 400 LLM calls.</p>
-        <div class="cb">
-<span class="cmt"># Multi-agent run</span><br />
-python main.py --max-problems 20 --model gpt-4o --output results/multi.json<br />
-<br />
-<span class="cmt"># Single-agent baseline</span><br />
-python main.py --max-problems 20 --model gpt-4o --mode single --output results/single.json
-        </div>
-      </div>
-    </li>
-
-    <li>
-      <span class="snum">10</span>
-      <div class="sbody">
-        <strong>Analyse results and write report</strong>
-        <p>Load both JSON files and compare:
-        overall pass rate, pass@1, average iterations, total token cost.
-        Plot pass rate vs number of iterations. Discuss whether more agents
-        always means better results, and where the system fails.</p>
-      </div>
-    </li>
-
+    <li><strong>After all problems:</strong> aggregate metrics are computed and saved as JSON
+    to the path given by <code>--output</code>.</li>
   </ol>
 
   <hr />
 
-  <h2>Key Metrics to Report</h2>
+  <h2>Prompt Content Per Agent</h2>
   <table>
-    <thead><tr><th>Metric</th><th>Definition</th><th>How to compute</th></tr></thead>
+    <thead><tr><th>Agent</th><th>System Prompt Summary</th><th>User Prompt Content</th></tr></thead>
     <tbody>
       <tr>
-        <td><strong>pass@1</strong></td>
-        <td>Fraction solved on the first code attempt (iteration = 1)</td>
-        <td><code>solved_in_1 / total_problems</code></td>
+        <td>Planner</td>
+        <td>Software architect, focus on algorithm + edge cases, no code</td>
+        <td>Problem description only</td>
       </tr>
       <tr>
-        <td><strong>pass@k</strong></td>
-        <td>Fraction solved within k iterations</td>
-        <td>Count problems where <code>iterations_used ≤ k</code></td>
+        <td>Coder (iter 1)</td>
+        <td>Expert Python dev, return only ```python``` fence</td>
+        <td>Problem + plan</td>
       </tr>
       <tr>
-        <td><strong>Overall pass rate</strong></td>
-        <td>Average test pass rate across all problems</td>
-        <td>Mean of <code>test_passed / (passed+failed+errors)</code></td>
+        <td>Coder (iter 2+)</td>
+        <td>Same</td>
+        <td>Problem + plan + previous code + test output + review</td>
       </tr>
       <tr>
-        <td><strong>Avg iterations</strong></td>
-        <td>How many feedback loops were needed on average</td>
-        <td>Mean of <code>iteration</code> field in final state</td>
+        <td>Tester</td>
+        <td>No LLM — subprocess pytest</td>
+        <td>N/A</td>
       </tr>
       <tr>
-        <td><strong>Total tokens</strong></td>
-        <td>Sum of all LLM tokens across all problems (API cost proxy)</td>
-        <td>Sum of <code>total_tokens</code> field across all states</td>
+        <td>Reviewer</td>
+        <td>Senior reviewer, say APPROVED or list specific bugs only</td>
+        <td>Problem + plan + code + test results (passed/total + truncated output)</td>
+      </tr>
+      <tr>
+        <td>SingleAgent</td>
+        <td>Expert Python dev, return only ```python``` fence</td>
+        <td>Problem description only — no plan, no feedback</td>
       </tr>
     </tbody>
   </table>
 
   <hr />
 
-  <h2>Common Pitfalls</h2>
+  <h2>What MetricsCollector Captures</h2>
+  <table>
+    <thead><tr><th>Metric</th><th>Formula</th><th>What it reveals</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><code>pass@1</code></td>
+        <td>Problems solved in exactly 1 iteration / total</td>
+        <td>Single-shot accuracy — single agent's strength</td>
+      </tr>
+      <tr>
+        <td><code>overall_pass_rate</code></td>
+        <td>Mean of (passed / total tests) across all problems</td>
+        <td>How close solutions get — partial credit</td>
+      </tr>
+      <tr>
+        <td><code>avg_iterations</code></td>
+        <td>Mean iterations per problem</td>
+        <td>How hard the loop worked; always 1 for single-agent</td>
+      </tr>
+      <tr>
+        <td><code>total_tokens</code></td>
+        <td>Sum across all problems and all agent calls</td>
+        <td>API cost proxy</td>
+      </tr>
+      <tr>
+        <td><code>avg_tokens_per_problem</code></td>
+        <td>total_tokens / n</td>
+        <td>Efficiency — how much does each problem cost?</td>
+      </tr>
+    </tbody>
+  </table>
 
-  <div class="warn">
-    <strong>The generated code must be importable.</strong> HumanEval's <code>check()</code>
-    calls the function by name (<code>check(has_close_elements)</code>), so the test file
-    must import it from <code>solution.py</code>. Make sure CoderAgent returns only
-    the function definition, not a <code>if __name__ == "__main__"</code> block.
+</div>
+
+<!-- ═══════════════ TAB 5 — RUNNING IT ══════════════════════════════════════ -->
+<div id="tab-run" class="tab-panel">
+
+  <h2>Setup</h2>
+
+  <h3>1 — Install dependencies</h3>
+  <div class="cb">cd Intelligent_Agent_Systems_LLMs
+PIPENV_IGNORE_VIRTUALENVS=1 pipenv install --dev</div>
+
+  <h3>2 — Configure API key</h3>
+  <div class="cb">cp .env.example .env
+<span class="cmt"># For OpenAI (GPT-4o / GPT-4o-mini):</span>
+OPENAI_API_KEY=sk-...
+
+<span class="cmt"># Or for Anthropic (Claude):</span>
+ANTHROPIC_API_KEY=sk-ant-...</div>
+
+  <h3>3 — Verify tests pass (no API key needed)</h3>
+  <div class="cb">PIPENV_IGNORE_VIRTUALENVS=1 pipenv run python -m pytest tests/ -v
+<span class="cmt"># Expected: 11 passed, 0 failed</span></div>
+
+  <hr />
+
+  <h2>Run the Benchmark</h2>
+
+  <h3>Smoke test (3 problems, cheap model, verify no crashes)</h3>
+  <div class="cb">PIPENV_IGNORE_VIRTUALENVS=1 pipenv run python main.py \
+  --benchmark data/HumanEval.jsonl \
+  --max-problems 3 \
+  --max-iterations 2 \
+  --model gpt-4o-mini \
+  --output results/smoke.json</div>
+
+  <h3>Full multi-agent run (for report)</h3>
+  <div class="cb">PIPENV_IGNORE_VIRTUALENVS=1 pipenv run python main.py \
+  --benchmark data/HumanEval.jsonl \
+  --max-problems 20 \
+  --max-iterations 5 \
+  --pass-threshold 1.0 \
+  --model gpt-4o \
+  --mode multi \
+  --output results/multi.json</div>
+
+  <h3>Single-agent baseline run (for comparison)</h3>
+  <div class="cb">PIPENV_IGNORE_VIRTUALENVS=1 pipenv run python main.py \
+  --benchmark data/HumanEval.jsonl \
+  --max-problems 20 \
+  --model gpt-4o \
+  --mode single \
+  --output results/single.json</div>
+
+  <h3>Using Claude instead of GPT</h3>
+  <div class="cb">PIPENV_IGNORE_VIRTUALENVS=1 pipenv run python main.py \
+  --model claude-sonnet-4-6 \
+  --mode multi \
+  --max-problems 20 \
+  --output results/multi_claude.json</div>
+
+  <hr />
+
+  <h2>CLI Reference</h2>
+  <table>
+    <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>--benchmark</code></td><td><code>data/HumanEval.jsonl</code></td><td>Path to JSONL file</td></tr>
+      <tr><td><code>--max-problems</code></td><td><code>10</code></td><td>Number of problems to run</td></tr>
+      <tr><td><code>--max-iterations</code></td><td><code>5</code></td><td>Max feedback loop iterations per problem</td></tr>
+      <tr><td><code>--pass-threshold</code></td><td><code>1.0</code></td><td>Pass rate to stop early (1.0 = all tests)</td></tr>
+      <tr><td><code>--model</code></td><td><code>gpt-4o</code></td><td>LLM model name (OpenAI or Claude)</td></tr>
+      <tr><td><code>--mode</code></td><td><code>multi</code></td><td><code>multi</code> or <code>single</code></td></tr>
+      <tr><td><code>--output</code></td><td><code>results/run.json</code></td><td>Output JSON path (auto-creates dir)</td></tr>
+    </tbody>
+  </table>
+
+  <hr />
+
+  <h2>Estimated API Cost</h2>
+  <table>
+    <thead><tr><th>Mode</th><th>Model</th><th>Approx LLM calls (20 problems)</th><th>Estimated cost</th></tr></thead>
+    <tbody>
+      <tr><td>single-agent</td><td>gpt-4o-mini</td><td>20</td><td>~$0.02</td></tr>
+      <tr><td>multi-agent</td><td>gpt-4o-mini</td><td>~200 (3 agents × avg 3 iters × 20)</td><td>~$0.20</td></tr>
+      <tr><td>single-agent</td><td>gpt-4o</td><td>20</td><td>~$0.40</td></tr>
+      <tr><td>multi-agent</td><td>gpt-4o</td><td>~200</td><td>~$4.00</td></tr>
+    </tbody>
+  </table>
+  <div class="info">
+    Develop and debug with <code>gpt-4o-mini</code> or <code>claude-haiku-4-5</code> to control costs.
+    Use the full model only for the final benchmark run that goes into the report.
   </div>
 
-  <div class="warn">
-    <strong>pytest output parsing is fragile.</strong> The current parser counts
-    <code>" PASSED"</code> and <code>" FAILED"</code> in stdout.
-    Use <code>pytest --tb=short -q</code> for consistent output,
-    or switch to <code>pytest --json-report</code> (install <code>pytest-json-report</code>)
-    for reliable structured output.
+</div>
+
+<!-- ═══════════════ TAB 6 — CURRENT STATUS ══════════════════════════════════ -->
+<div id="tab-status" class="tab-panel">
+
+  <h2>What Is Done</h2>
+
+  <div class="card-grid">
+    <div class="card"><span class="badge b-green">Done</span>
+      <h4>PlannerAgent.run()</h4>
+      <p>Full LLM call via LangChain. Tenacity retry (3 attempts, exponential backoff).
+      Tokens counted and passed to state.</p>
+    </div>
+    <div class="card"><span class="badge b-green">Done</span>
+      <h4>CoderAgent.run()</h4>
+      <p>Builds structured multi-section prompt from plan + feedback.
+      Extracts code from markdown fences. Handles iteration 1 vs 2+ context.</p>
+    </div>
+    <div class="card"><span class="badge b-green">Done</span>
+      <h4>TesterAgent</h4>
+      <p>Subprocess pytest. Runs problem-specific HumanEval checks (adapted to pytest).
+      No LLM cost. 30s timeout. All 3 unit tests pass.</p>
+    </div>
+    <div class="card"><span class="badge b-green">Done</span>
+      <h4>ReviewerAgent.run()</h4>
+      <p>LLM call with code + test results. Returns APPROVED or actionable bug list.
+      Case-insensitive APPROVED detection.</p>
+    </div>
+    <div class="card"><span class="badge b-green">Done</span>
+      <h4>SingleAgent (Baseline)</h4>
+      <p>One-shot LLM agent in <code>agents/single_agent.py</code>.
+      Activated by <code>--mode single</code> in main.py.</p>
+    </div>
+    <div class="card"><span class="badge b-green">Done</span>
+      <h4>HumanEval Test Adapter</h4>
+      <p>Converts <code>check(candidate)</code> format to pytest automatically.
+      Uses <code>entry_point</code> field for correct import + test call.</p>
+    </div>
+    <div class="card"><span class="badge b-green">Done</span>
+      <h4>LLM Factory (utils/llm_client.py)</h4>
+      <p>Auto-selects ChatAnthropic or ChatOpenAI by model name prefix.
+      Safe token extraction handles dict and object metadata.</p>
+    </div>
+    <div class="card"><span class="badge b-green">Done</span>
+      <h4>Tenacity Retry Wrappers</h4>
+      <p>All LLM agents: <code>wait_exponential(min=4, max=60)</code>,
+      <code>stop_after_attempt(3)</code>. Prevents crashes on rate limits.</p>
+    </div>
+    <div class="card"><span class="badge b-green">Done</span>
+      <h4>LangGraph Pipeline</h4>
+      <p>Planner → Coder → Tester → Reviewer loop with conditional edge.
+      build_graph() compiles without errors.</p>
+    </div>
+    <div class="card"><span class="badge b-green">Done</span>
+      <h4>Metrics + CLI</h4>
+      <p>MetricsCollector tracks pass@1, pass_rate, iterations, tokens.
+      CLI supports --mode multi|single, all flags documented.</p>
+    </div>
+    <div class="card"><span class="badge b-green">Done</span>
+      <h4>Unit Tests (11 passing)</h4>
+      <p>TesterAgent sandbox, graph stopping logic, JSONL parsing + pytest adaptation.
+      All pass without an API key.</p>
+    </div>
+    <div class="card"><span class="badge b-green">Done</span>
+      <h4>HumanEval Dataset</h4>
+      <p>164 problems at <code>data/HumanEval.jsonl</code>.
+      Benchmark loader reads entry_point, prompt, test, and canonical_solution.</p>
+    </div>
   </div>
 
-  <div class="warn">
-    <strong>Rate limits will hit during a full run.</strong> Wrap every LLM call with
-    <code>tenacity.retry</code> (already in Pipfile). Set <code>wait=tenacity.wait_exponential(min=4, max=60)</code>.
+  <hr />
+
+  <h2>What Remains</h2>
+
+  <div class="card-grid">
+    <div class="card">
+      <span class="badge" style="background:#451a03;color:#fbbf24">TODO</span>
+      <h4>Run the Actual Benchmark</h4>
+      <p>No real runs have been executed yet. The <code>results/</code> folder is empty.
+      Execute both modes on 20–30 problems to generate comparison data for the report.</p>
+    </div>
+    <div class="card">
+      <span class="badge" style="background:#451a03;color:#fbbf24">TODO</span>
+      <h4>README.md</h4>
+      <p>Currently empty. Needs install instructions, .env setup, run commands, and a results
+      summary for submission.</p>
+    </div>
+    <div class="card">
+      <span class="badge" style="background:#1e293b;color:#475569;border:1px solid #334155">Optional</span>
+      <h4>Remove/Integrate orchestrator.py</h4>
+      <p>The manual orchestration loop in <code>orchestration/orchestrator.py</code> duplicates
+      the LangGraph pipeline and is not called from anywhere. Clean it up before submission.</p>
+    </div>
   </div>
 
-  <div class="good">
-    <strong>Start cheap.</strong> Use <code>gpt-4o-mini</code> for development runs
-    and switch to <code>gpt-4o</code> only for the final benchmark.
-    <code>gpt-4o-mini</code> costs ~20× less and is good enough to verify the pipeline works.
+  <div class="warn" style="margin-top:20px">
+    <strong>Only an API key is needed to run the benchmark.</strong>
+    Copy <code>.env.example</code> → <code>.env</code> and fill in
+    <code>OPENAI_API_KEY</code> or <code>ANTHROPIC_API_KEY</code>.
+    Then run the smoke test (3 problems) before the full 20-problem run.
   </div>
 
 </div>

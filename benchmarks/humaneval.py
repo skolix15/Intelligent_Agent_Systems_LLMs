@@ -8,7 +8,27 @@ class Problem:
     problem_id: str
     description: str
     canonical_solution: str
-    tests: str  # pytest-compatible test string
+    entry_point: str       # name of the function to implement
+    tests: str             # pytest-compatible test string (adapted from HumanEval format)
+
+
+def _adapt_tests_to_pytest(raw_test: str, entry_point: str) -> str:
+    """
+    Convert HumanEval's check(candidate) test format into a pytest-runnable file.
+
+    HumanEval tests look like:
+        def check(candidate):
+            assert candidate(...) == expected
+
+    We wrap them so pytest can discover and run a single test_check() function
+    that calls check(entry_point_function_imported_from_solution).
+    """
+    return (
+        f"from solution import {entry_point}\n\n"
+        f"{raw_test.strip()}\n\n"
+        f"def test_check():\n"
+        f"    check({entry_point})\n"
+    )
 
 
 class HumanEvalBenchmark:
@@ -16,7 +36,8 @@ class HumanEvalBenchmark:
     Loads a subset of HumanEval problems from a local JSONL file.
 
     Expected JSONL format (one JSON object per line):
-      {"task_id": "HumanEval/0", "prompt": "...", "canonical_solution": "...", "test": "..."}
+      {"task_id": "HumanEval/0", "prompt": "...", "entry_point": "...",
+       "canonical_solution": "...", "test": "..."}
     """
 
     def __init__(self, path: str | Path, max_problems: int | None = None):
@@ -30,12 +51,14 @@ class HumanEvalBenchmark:
                 if max_problems and i >= max_problems:
                     break
                 raw = json.loads(line)
+                entry_point = raw["entry_point"]
                 self.problems.append(
                     Problem(
                         problem_id=raw["task_id"],
                         description=raw["prompt"],
                         canonical_solution=raw["canonical_solution"],
-                        tests=raw["test"],
+                        entry_point=entry_point,
+                        tests=_adapt_tests_to_pytest(raw["test"], entry_point),
                     )
                 )
 

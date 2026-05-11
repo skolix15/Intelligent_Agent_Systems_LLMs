@@ -1,0 +1,22 @@
+# Environment & secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+
+# Pipenv
+Pipfile.lock
+
+# Results
+results/
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/

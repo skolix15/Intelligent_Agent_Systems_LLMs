@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"import sys,json; d=json.loads\\(sys.stdin.readline\\(\\)\\); print\\('KEYS:', list\\(d.keys\\(\\)\\)\\); print\\(\\); print\\('PROMPT:'\\); print\\(d['prompt'][:400]\\); print\\(\\); print\\('TEST:'\\); print\\(d['test'][:600]\\); print\\(\\); print\\('entry_point:', d.get\\('entry_point'\\)\\)\")",
+      "Bash(python -m pytest tests/ -v)",
+      "Bash(pipenv run *)",
+      "Bash(PIPENV_IGNORE_VIRTUALENVS=1 pipenv --venv)",
+      "Read(//Users/skolix15/Library/Python/**)",
+      "Read(//Users/skolix15/.pyenv/**)",
+      "Bash(PIPENV_IGNORE_VIRTUALENVS=1 pipenv install --dev)",
+      "Bash(PIPENV_IGNORE_VIRTUALENVS=1 pipenv run python -m pytest tests/ -v)",
+      "Bash(chmod +x \"/Users/skolix15/Desktop/Μεταπτυχιακό - Εργασίες/Κράβαρη/Intelligent_Agent_Systems_LLMs/run.sh\")"
+    ]
+  }
+}
