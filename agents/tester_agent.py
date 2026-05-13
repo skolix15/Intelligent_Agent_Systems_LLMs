@@ -61,15 +61,18 @@ class TesterAgent(BaseAgent):
             with open(test_path, "w") as f:
                 f.write(tests)
 
-            result = subprocess.run(
-                ["python", "-m", "pytest", test_path, "-v", "--tb=short"],
-                capture_output=True,
-                text=True,
-                timeout=30,
-                cwd=tmp_dir,
-            )
+            try:
+                result = subprocess.run(
+                    ["python", "-m", "pytest", test_path, "-v", "--tb=short"],
+                    capture_output=True,
+                    text=True,
+                    timeout=30,
+                    cwd=tmp_dir,
+                )
+                output = result.stdout + result.stderr
+            except subprocess.TimeoutExpired:
+                return TestResult(passed=0, failed=1, errors=0, output="TIMEOUT: test execution exceeded 30s (likely infinite loop)")
 
-            output = result.stdout + result.stderr
             passed = output.count(" PASSED")
             failed = output.count(" FAILED")
             errors = output.count(" ERROR")

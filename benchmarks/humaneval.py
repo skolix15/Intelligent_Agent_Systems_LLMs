@@ -49,8 +49,8 @@ class HumanEvalBenchmark:
     def _load(self, max_problems: int | None) -> None:
         with open(self.path) as f:
             all_lines = f.readlines()
-        if max_problems:
-            all_lines = random.sample(all_lines, min(max_problems, len(all_lines)))
+        n = min(max_problems, len(all_lines)) if max_problems else len(all_lines)
+        all_lines = random.sample(all_lines, n)
         for line in all_lines:
             raw = json.loads(line)
             entry_point = raw["entry_point"]
