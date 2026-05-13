@@ -9,7 +9,8 @@
       "Read(//Users/skolix15/.pyenv/**)",
       "Bash(PIPENV_IGNORE_VIRTUALENVS=1 pipenv install --dev)",
       "Bash(PIPENV_IGNORE_VIRTUALENVS=1 pipenv run python -m pytest tests/ -v)",
-      "Bash(chmod +x \"/Users/skolix15/Desktop/Μεταπτυχιακό - Εργασίες/Κράβαρη/Intelligent_Agent_Systems_LLMs/run.sh\")"
+      "Bash(chmod +x \"/Users/skolix15/Desktop/Μεταπτυχιακό - Εργασίες/Κράβαρη/Intelligent_Agent_Systems_LLMs/run.sh\")",
+      "Bash(python3 -)"
     ]
   }
 }

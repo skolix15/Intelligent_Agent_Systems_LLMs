@@ -1,4 +1,5 @@
 import json
+import random
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -47,20 +48,21 @@ class HumanEvalBenchmark:
 
     def _load(self, max_problems: int | None) -> None:
         with open(self.path) as f:
-            for i, line in enumerate(f):
-                if max_problems and i >= max_problems:
-                    break
-                raw = json.loads(line)
-                entry_point = raw["entry_point"]
-                self.problems.append(
-                    Problem(
-                        problem_id=raw["task_id"],
-                        description=raw["prompt"],
-                        canonical_solution=raw["canonical_solution"],
-                        entry_point=entry_point,
-                        tests=_adapt_tests_to_pytest(raw["test"], entry_point),
-                    )
+            all_lines = f.readlines()
+        if max_problems:
+            all_lines = random.sample(all_lines, min(max_problems, len(all_lines)))
+        for line in all_lines:
+            raw = json.loads(line)
+            entry_point = raw["entry_point"]
+            self.problems.append(
+                Problem(
+                    problem_id=raw["task_id"],
+                    description=raw["prompt"],
+                    canonical_solution=raw["canonical_solution"],
+                    entry_point=entry_point,
+                    tests=_adapt_tests_to_pytest(raw["test"], entry_point),
                 )
+            )
 
     def __len__(self) -> int:
         return len(self.problems)

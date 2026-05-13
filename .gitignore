@@ -11,8 +11,8 @@ venv/
 # Pipenv
 Pipfile.lock
 
-# Results
-results/
+# # Results
+# results/
 
 # macOS
 .DS_Store
