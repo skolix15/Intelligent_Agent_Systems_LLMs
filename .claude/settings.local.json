@@ -10,7 +10,14 @@
       "Bash(PIPENV_IGNORE_VIRTUALENVS=1 pipenv install --dev)",
       "Bash(PIPENV_IGNORE_VIRTUALENVS=1 pipenv run python -m pytest tests/ -v)",
       "Bash(chmod +x \"/Users/skolix15/Desktop/Μεταπτυχιακό - Εργασίες/Κράβαρη/Intelligent_Agent_Systems_LLMs/run.sh\")",
-      "Bash(python3 -)"
+      "Bash(python3 -)",
+      "Bash(cat)",
+      "Bash(python /tmp/extract_full.py)",
+      "Bash(python /tmp/extract_all.py)",
+      "Bash(python /tmp/extract_correct.py)",
+      "Bash(python /tmp/extract_single.py)",
+      "Bash(python /tmp/final_extract.py)",
+      "Bash(python /tmp/final_extract2.py)"
     ]
   }
 }
