@@ -9,7 +9,7 @@ This report evaluates a **4-agent LangGraph pipeline** (PlannerAgent → CoderAg
 
 > *When and why does collaboration among multiple specialized agents outperform a single general-purpose agent — and at what cost?*
 
-Both runs were evaluated on **100 randomly sampled HumanEval problems** using `gpt-4o-mini` as the underlying LLM. The problem sets differ between runs due to random sampling, so per-problem comparisons serve as illustrative examples rather than direct head-to-head matches.
+Both runs were evaluated on **100 randomly sampled HumanEval problems** using `gpt-3.5-turbo` as the underlying LLM. The problem sets differ between runs due to random sampling, so per-problem comparisons serve as illustrative examples rather than direct head-to-head matches.
 
 ---
 
@@ -66,7 +66,7 @@ The most striking finding is the **disproportionate token cost** of the multi-ag
 - Single-agent consumed **24,742 tokens** to solve **71 problems**
 - **Cost per solved problem:** Single = 349 tokens; Multi = 10,779 tokens — a **30.9× efficiency disadvantage**
 
-This directly addresses the assignment's requirement to analyze *"iterations vs. quality vs. API call cost"*: for `gpt-4o-mini` at current pricing (~$0.15/1M input tokens), the multi-agent run costs approximately **30× more** while improving accuracy by only **1 percentage point**.
+This directly addresses the assignment's requirement to analyze *"iterations vs. quality vs. API call cost"*: for `gpt-3.5-turbo` at current pricing (~$0.50/1M input tokens), the multi-agent run costs approximately **30× more** while improving accuracy by only **1 percentage point**.
 
 ---
 
@@ -89,7 +89,7 @@ The feedback loop provided measurable benefit on problems where the first code a
 
 ### 4.2 When Multi-Agent Fails to Outperform
 
-**27 problems** in the multi-agent run exhausted all 10 iterations without passing (0/1 tests). On several of these, the single agent also failed — suggesting the problems are genuinely hard for `gpt-4o-mini`. However, for some problems (e.g., HumanEval/99, HumanEval/123, HumanEval/138) the single agent **succeeded in one shot** while the multi-agent system failed after 10 iterations.
+**27 problems** in the multi-agent run exhausted all 10 iterations without passing (0/1 tests). On several of these, the single agent also failed — suggesting the problems are genuinely hard for `gpt-3.5-turbo`. However, for some problems (e.g., HumanEval/99, HumanEval/123, HumanEval/138) the single agent **succeeded in one shot** while the multi-agent system failed after 10 iterations.
 
 This reveals a significant weakness: the **reviewer and planner can introduce interference**. When the PlannerAgent generates a flawed decomposition, or when the ReviewerAgent provides vague or incorrect bug descriptions, the CoderAgent iterates toward an increasingly incorrect solution — a phenomenon sometimes called **"feedback poisoning"** in multi-agent literature.
 
@@ -150,7 +150,7 @@ HumanEval/125 (7 iterations to pass) and HumanEval/12 (8 iterations to pass) dem
 
 | Finding | Implication |
 |---|---|
-| +1% solve rate at 31× token cost | Multi-agent is not cost-effective at this scale for `gpt-4o-mini` |
+| +1% solve rate at 31× token cost | Multi-agent is not cost-effective at this scale for `gpt-3.5-turbo` |
 | Feedback loop rescued ~6 problems | Loop value is real but narrow — applies only to "near-miss" cases |
 | 27/100 problems hit max iterations | Failure mode is expensive; early termination heuristics needed |
 | Some single-pass successes became multi-agent failures | Planner/reviewer can degrade performance on straightforward problems |
@@ -174,7 +174,7 @@ It does **not** outperform when:
 
 1. **Adaptive pipeline**: bypass PlannerAgent for low-complexity problems (e.g., based on description length or keyword heuristics)
 2. **Early stopping improvement**: add confidence scoring from the ReviewerAgent to exit before 10 iterations when recovery is unlikely
-3. **Stronger model**: repeat experiment with `gpt-4o` or `claude-sonnet` — the feedback loop likely shows greater benefit when the coder can act on subtler bug descriptions
+3. **Stronger model**: repeat experiment with `gpt-4o-mini`, `gpt-4o`, or `claude-sonnet` — the feedback loop likely shows greater benefit when the coder can act on subtler bug descriptions
 4. **Larger sample**: 164-problem full run needed for statistically significant conclusions (current ±5% confidence interval is wide)
 5. **Cost-weighted metric**: report "tokens per solved problem" as a primary metric alongside solve rate
 

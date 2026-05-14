@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analysis Report — Multi-Agent vs Single-Agent</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f0f4f8;
+      color: #2d3748;
+      line-height: 1.7;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #2b4c7e 0%, #1a3358 100%);
+      color: #fff;
+      padding: 40px 40px 32px;
+    }
+    header h1 { font-size: 1.85rem; font-weight: 700; }
+    header .subtitle { margin-top: 5px; color: #b8cce4; font-size: 0.95rem; }
+    header .meta { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
+    header .meta span {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 20px;
+      padding: 3px 14px;
+      font-size: 0.8rem;
+      color: #dce8f5;
+    }
+
+    /* ── Tab bar ── */
+    .tab-bar {
+      background: #fff;
+      border-bottom: 2px solid #e2e8f0;
+      display: flex;
+      gap: 0;
+      padding: 0 32px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      overflow-x: auto;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      padding: 14px 20px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #718096;
+      cursor: pointer;
+      margin-bottom: -2px;
+      transition: color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+    .tab-btn:hover { color: #2b4c7e; }
+    .tab-btn.active { color: #2b4c7e; border-bottom-color: #2b4c7e; }
+
+    /* ── Tab panels ── */
+    .tab-panel { display: none; max-width: 1060px; margin: 0 auto; padding: 36px 24px 60px; }
+    .tab-panel.active { display: block; }
+
+    /* ── Typography ── */
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #1a3358;
+      margin: 36px 0 14px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    h2:first-child { margin-top: 0; }
+    h3 { font-size: 1rem; font-weight: 700; color: #2d3748; margin: 24px 0 10px; }
+    p { color: #4a5568; margin-bottom: 12px; font-size: 0.93rem; }
+
+    /* ── KPI cards ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 14px;
+      margin: 20px 0 28px;
+    }
+    .kpi {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 18px 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .kpi .label { font-size: 0.73rem; color: #718096; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 600; }
+    .kpi .value { font-size: 1.9rem; font-weight: 800; margin-top: 5px; }
+    .kpi .sub { font-size: 0.76rem; color: #a0aec0; margin-top: 2px; }
+    .kpi.blue   .value { color: #2b6cb0; }
+    .kpi.purple .value { color: #6b46c1; }
+    .kpi.green  .value { color: #276749; }
+    .kpi.red    .value { color: #c53030; }
+    .kpi.amber  .value { color: #b7791f; }
+
+    /* ── Two-column comparison ── */
+    .comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0;
+    }
+    @media (max-width: 640px) { .comparison { grid-template-columns: 1fr; } }
+    .panel {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 22px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .panel h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 14px; }
+    .panel.single h4 { color: #2b6cb0; }
+    .panel.multi  h4 { color: #6b46c1; }
+    .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid #f0f4f8; font-size: 0.875rem; }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-row .key { color: #718096; }
+    .stat-row .val { font-weight: 700; color: #2d3748; }
+
+    /* ── Bar chart ── */
+    .bar-section { margin: 20px 0 28px; }
+    .bar-item { margin-bottom: 12px; }
+    .bar-label { font-size: 0.8rem; color: #4a5568; margin-bottom: 4px; display: flex; justify-content: space-between; }
+    .bar-track { background: #e2e8f0; border-radius: 4px; height: 11px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; }
+    .bar-fill.single { background: linear-gradient(90deg, #3182ce, #63b3ed); }
+    .bar-fill.multi  { background: linear-gradient(90deg, #6b46c1, #b794f4); }
+    .bar-fill.red    { background: linear-gradient(90deg, #c53030, #fc8181); }
+    .bar-fill.amber  { background: linear-gradient(90deg, #b7791f, #f6ad55); }
+
+    /* ── Tables ── */
+    .table-wrap { overflow-x: auto; margin: 16px 0; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.865rem; background: #fff; }
+    thead tr { background: #f7fafc; }
+    th { padding: 11px 16px; text-align: left; color: #4a5568; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid #e2e8f0; }
+    td { padding: 10px 16px; border-bottom: 1px solid #f0f4f8; color: #4a5568; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f7fafc; }
+    .pass { color: #276749; font-weight: 700; }
+    .fail { color: #c53030; font-weight: 700; }
+    .warn { color: #b7791f; font-weight: 700; }
+
+    /* ── Callout boxes ── */
+    .callout {
+      border-left: 4px solid;
+      border-radius: 0 8px 8px 0;
+      padding: 13px 18px;
+      margin: 18px 0;
+      font-size: 0.88rem;
+    }
+    .callout.info    { background: #ebf8ff; border-color: #3182ce; color: #2c5282; }
+    .callout.success { background: #f0fff4; border-color: #38a169; color: #22543d; }
+    .callout.warning { background: #fffbeb; border-color: #d69e2e; color: #744210; }
+    .callout.danger  { background: #fff5f5; border-color: #e53e3e; color: #742a2a; }
+
+    /* ── Pipeline diagram ── */
+    .pipeline {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 18px 0 24px;
+    }
+    .pipe-node {
+      background: #ebf4ff;
+      border: 1.5px solid #bee3f8;
+      border-radius: 8px;
+      padding: 9px 16px;
+      font-size: 0.82rem;
+      color: #2b4c7e;
+      font-weight: 700;
+    }
+    .pipe-arrow { color: #a0aec0; font-size: 1.2rem; }
+    .pipe-loop { font-size: 0.73rem; color: #718096; font-style: italic; }
+
+    /* ── Code block ── */
+    pre {
+      background: #f7fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-family: "JetBrains Mono", "Fira Code", monospace;
+      font-size: 0.8rem;
+      color: #2d3748;
+      overflow-x: auto;
+      margin: 12px 0;
+    }
+
+    /* ── Conclusion cards ── */
+    .conclusion-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      margin: 20px 0;
+    }
+    .conclusion-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid #2b4c7e;
+      border-radius: 0 10px 10px 0;
+      padding: 16px 18px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .conclusion-card .c-title { font-size: 0.8rem; font-weight: 700; color: #2b4c7e; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+    .conclusion-card p { font-size: 0.85rem; color: #4a5568; margin: 0; }
+    .conclusion-card.green { border-left-color: #38a169; }
+    .conclusion-card.green .c-title { color: #276749; }
+    .conclusion-card.red { border-left-color: #e53e3e; }
+    .conclusion-card.red .c-title { color: #c53030; }
+    .conclusion-card.amber { border-left-color: #d69e2e; }
+    .conclusion-card.amber .c-title { color: #b7791f; }
+
+    /* ── Numbered list ── */
+    .num-list { list-style: none; padding: 0; margin: 14px 0; }
+    .num-list li {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f4f8;
+      font-size: 0.9rem;
+      color: #4a5568;
+    }
+    .num-list li:last-child { border-bottom: none; }
+    .num-list li .num {
+      min-width: 26px;
+      height: 26px;
+      background: #2b4c7e;
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 0.78rem;
+      color: #a0aec0;
+      border-top: 1px solid #e2e8f0;
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Multi-Agent vs Single-Agent Code Generation</h1>
+  <p class="subtitle">HumanEval Benchmark — LangGraph Pipeline Evaluation</p>
+  <div class="meta">
+    <span>Model: gpt-3.5-turbo</span>
+    <span>Dataset: HumanEval (100 problems each)</span>
+    <span>Framework: LangGraph</span>
+    <span>Course: Intelligent Agent Systems &amp; LLMs</span>
+  </div>
+</header>
+
+<nav class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('overview', this)">Overview</button>
+  <button class="tab-btn" onclick="switchTab('results', this)">Results</button>
+  <button class="tab-btn" onclick="switchTab('analysis', this)">Analysis</button>
+  <button class="tab-btn" onclick="switchTab('design', this)">Design Decisions</button>
+  <button class="tab-btn" onclick="switchTab('theory', this)">Theory</button>
+  <button class="tab-btn" onclick="switchTab('conclusions', this)">Conclusions</button>
+</nav>
+
+<!-- ══════════════════════════════════════════════ TAB 1: OVERVIEW -->
+<div class="tab-panel active" id="tab-overview">
+
+  <h2>Research Question</h2>
+  <div class="callout info">
+    <strong>Central question:</strong> When and why does collaboration among multiple specialized agents
+    outperform a single general-purpose agent — and at what cost?
+  </div>
+  <p>
+    This report evaluates a <strong>4-agent LangGraph pipeline</strong> (PlannerAgent → CoderAgent →
+    TesterAgent → ReviewerAgent) against a <strong>single-agent baseline</strong> on the HumanEval dataset.
+    Both runs used <strong>100 randomly sampled problems</strong> with <code>gpt-3.5-turbo</code>.
+    Because problems are randomly sampled, per-problem comparisons are illustrative; aggregate metrics
+    are the primary basis for conclusions.
+  </p>
+
+  <h2>System Architecture</h2>
+  <h3>Multi-Agent Pipeline</h3>
+  <div class="pipeline">
+    <div class="pipe-node">PlannerAgent</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-node">CoderAgent</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-node">TesterAgent</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-node">ReviewerAgent</div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-node" style="background:#f0fff4;border-color:#9ae6b4;color:#276749">END / retry</div>
+    <span class="pipe-loop">&nbsp;(loops back to CoderAgent on failure)</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Agent</th><th>Role</th><th>Uses LLM</th></tr></thead>
+      <tbody>
+        <tr><td><strong>PlannerAgent</strong></td><td>Decomposes the problem into a step-by-step plan</td><td class="pass">Yes</td></tr>
+        <tr><td><strong>CoderAgent</strong></td><td>Generates / revises Python code based on plan + feedback</td><td class="pass">Yes</td></tr>
+        <tr><td><strong>TesterAgent</strong></td><td>Runs pytest in an isolated subprocess — purely deterministic</td><td class="fail">No</td></tr>
+        <tr><td><strong>ReviewerAgent</strong></td><td>Outputs APPROVED or a structured bug list</td><td class="pass">Yes</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p><strong>Termination:</strong> test pass rate ≥ threshold <em>or</em> max iterations reached (10).</p>
+
+  <h3>Single-Agent Baseline</h3>
+  <p>
+    A single CoderAgent receives the raw problem description and generates code in one shot —
+    no planning, no testing feedback, no review cycle. Zero-iteration baseline.
+  </p>
+
+  <pre>Single:  CoderAgent → TesterAgent → END
+Multi:   PlannerAgent → CoderAgent → TesterAgent → ReviewerAgent → (retry or END)</pre>
+</div>
+
+<!-- ══════════════════════════════════════════════ TAB 2: RESULTS -->
+<div class="tab-panel" id="tab-results">
+
+  <h2>Aggregate Metrics</h2>
+  <div class="kpi-grid">
+    <div class="kpi blue">
+      <div class="label">Single — Solve Rate</div>
+      <div class="value">71%</div>
+      <div class="sub">71 / 100 problems</div>
+    </div>
+    <div class="kpi purple">
+      <div class="label">Multi — Solve Rate</div>
+      <div class="value">72%</div>
+      <div class="sub">72 / 100 problems</div>
+    </div>
+    <div class="kpi blue">
+      <div class="label">Single — Tokens</div>
+      <div class="value">24,742</div>
+      <div class="sub">247 per problem</div>
+    </div>
+    <div class="kpi red">
+      <div class="label">Multi — Tokens</div>
+      <div class="value">776,072</div>
+      <div class="sub">7,760 per problem</div>
+    </div>
+    <div class="kpi amber">
+      <div class="label">Token Cost Ratio</div>
+      <div class="value">31.4×</div>
+      <div class="sub">Multi vs Single</div>
+    </div>
+    <div class="kpi purple">
+      <div class="label">Multi — Avg Iterations</div>
+      <div class="value">3.7</div>
+      <div class="sub">Single always 1.0</div>
+    </div>
+  </div>
+
+  <h2>Side-by-Side Comparison</h2>
+  <div class="comparison">
+    <div class="panel single">
+      <h4>Single-Agent Baseline</h4>
+      <div class="stat-row"><span class="key">Problems evaluated</span><span class="val">100</span></div>
+      <div class="stat-row"><span class="key">Solved</span><span class="val">71</span></div>
+      <div class="stat-row"><span class="key">Solve rate</span><span class="val">71%</span></div>
+      <div class="stat-row"><span class="key">Avg iterations</span><span class="val">1.0</span></div>
+      <div class="stat-row"><span class="key">Total tokens</span><span class="val">24,742</span></div>
+      <div class="stat-row"><span class="key">Tokens / problem</span><span class="val">247</span></div>
+      <div class="stat-row"><span class="key">Tokens / solved</span><span class="val">349</span></div>
+      <div class="stat-row"><span class="key">Min tokens (HE/27)</span><span class="val">114</span></div>
+      <div class="stat-row"><span class="key">Max tokens (HE/81)</span><span class="val">581</span></div>
+    </div>
+    <div class="panel multi">
+      <h4>Multi-Agent Pipeline</h4>
+      <div class="stat-row"><span class="key">Problems evaluated</span><span class="val">100</span></div>
+      <div class="stat-row"><span class="key">Solved</span><span class="val">72</span></div>
+      <div class="stat-row"><span class="key">Solve rate</span><span class="val">72%</span></div>
+      <div class="stat-row"><span class="key">Avg iterations</span><span class="val">3.7</span></div>
+      <div class="stat-row"><span class="key">Total tokens</span><span class="val">776,072</span></div>
+      <div class="stat-row"><span class="key">Tokens / problem</span><span class="val">7,760</span></div>
+      <div class="stat-row"><span class="key">Tokens / solved</span><span class="val">10,779</span></div>
+      <div class="stat-row"><span class="key">1-iter solves</span><span class="val">64 / 100</span></div>
+      <div class="stat-row"><span class="key">Max-iter failures</span><span class="val">27 / 100</span></div>
+    </div>
+  </div>
+
+  <h2>Solve Rate vs Token Cost</h2>
+  <div class="bar-section">
+    <div class="bar-item">
+      <div class="bar-label"><span>Single — Solve Rate</span><span>71%</span></div>
+      <div class="bar-track"><div class="bar-fill single" style="width:71%"></div></div>
+    </div>
+    <div class="bar-item">
+      <div class="bar-label"><span>Multi — Solve Rate</span><span>72%</span></div>
+      <div class="bar-track"><div class="bar-fill multi" style="width:72%"></div></div>
+    </div>
+  </div>
+
+  <h2>Multi-Agent Iteration Distribution</h2>
+  <div class="bar-section">
+    <div class="bar-item">
+      <div class="bar-label"><span>Solved on first attempt</span><span>64 problems (64%)</span></div>
+      <div class="bar-track"><div class="bar-fill single" style="width:64%"></div></div>
+    </div>
+    <div class="bar-item">
+      <div class="bar-label"><span>Recovered in 2–3 iterations</span><span>~9 problems (9%)</span></div>
+      <div class="bar-track"><div class="bar-fill multi" style="width:9%"></div></div>
+    </div>
+    <div class="bar-item">
+      <div class="bar-label"><span>Hard recovery (7–8 iterations)</span><span>2 problems (2%)</span></div>
+      <div class="bar-track"><div class="bar-fill amber" style="width:2%"></div></div>
+    </div>
+    <div class="bar-item">
+      <div class="bar-label"><span>Max iterations reached — all failed</span><span>27 problems (27%)</span></div>
+      <div class="bar-track"><div class="bar-fill red" style="width:27%"></div></div>
+    </div>
+  </div>
+
+  <div class="callout warning">
+    <strong>Key finding:</strong> 64% of multi-agent problems were solved in one iteration — the planning
+    overhead added cost without enabling any feedback loop benefit for the majority of problems.
+    27% exhausted the full 10-iteration budget and still failed.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ TAB 3: ANALYSIS -->
+<div class="tab-panel" id="tab-analysis">
+
+  <h2>When the Feedback Loop Helped</h2>
+  <p>
+    The iterative feedback loop provided measurable value on problems where the first attempt was
+    <strong>nearly correct</strong> — a small, identifiable bug that precise pytest output could expose.
+  </p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Problem</th><th>Iterations</th><th>Tokens</th><th>Multi Outcome</th><th>Single Outcome</th></tr></thead>
+      <tbody>
+        <tr><td>HumanEval/125</td><td class="warn">7</td><td>7,394</td><td class="pass">✓ PASS</td><td class="fail">✗ FAIL</td></tr>
+        <tr><td>HumanEval/12</td><td class="warn">8</td><td>7,398</td><td class="pass">✓ PASS</td><td style="color:#718096">not in sample</td></tr>
+        <tr><td>HumanEval/91</td><td>3</td><td>2,673</td><td class="pass">✓ PASS</td><td class="fail">✗ FAIL</td></tr>
+        <tr><td>HumanEval/75</td><td>2</td><td>1,489</td><td class="pass">✓ PASS</td><td class="fail">✗ FAIL (0/2)</td></tr>
+        <tr><td>HumanEval/88</td><td>2</td><td>1,604</td><td class="pass">✓ PASS</td><td style="color:#718096">not in sample</td></tr>
+        <tr><td>HumanEval/9</td><td>2</td><td>748</td><td class="pass">✓ PASS</td><td style="color:#718096">not in sample</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout success">
+    <strong>HumanEval/125</strong> is the strongest example of emergent behavior: single-agent failed
+    outright, while the multi-agent system recovered after 7 iterations using precise test failure messages
+    — an outcome neither agent could achieve alone.
+  </div>
+
+  <h2>Expensive Dead Ends — Max-Iteration Failures</h2>
+  <p>
+    27 problems exhausted all 10 iterations with 0 tests passing. On some (e.g., HumanEval/99, /123, /138)
+    the single agent succeeded in one shot — the planner or reviewer introduced incorrect guidance that
+    misdirected the coder, a <strong>"feedback poisoning"</strong> effect.
+  </p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Problem</th><th>Iterations</th><th>Tokens wasted</th><th>Outcome</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>HumanEval/32</td><td class="fail">10</td><td class="fail">13,921</td><td class="fail">✗ FAIL</td><td></td></tr>
+        <tr><td>HumanEval/81</td><td class="fail">10</td><td class="fail">13,450</td><td class="fail">✗ FAIL</td><td></td></tr>
+        <tr><td>HumanEval/115</td><td class="fail">10</td><td class="fail">12,817</td><td class="fail">✗ FAIL</td><td></td></tr>
+        <tr><td>HumanEval/130</td><td class="fail">10</td><td class="fail">12,761</td><td class="fail">✗ FAIL</td><td></td></tr>
+        <tr><td>HumanEval/64</td><td class="fail">10</td><td class="fail">12,477</td><td class="fail">✗ FAIL</td><td></td></tr>
+        <tr><td>HumanEval/123</td><td class="fail">10</td><td class="fail">11,330</td><td class="fail">✗ FAIL</td><td class="warn">Single PASSED!</td></tr>
+        <tr><td>HumanEval/138</td><td class="fail">10</td><td class="fail">9,060</td><td class="fail">✗ FAIL</td><td class="warn">Single PASSED!</td></tr>
+        <tr><td>HumanEval/99</td><td class="fail">10</td><td class="fail">9,799</td><td class="fail">✗ FAIL</td><td class="warn">Single PASSED!</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Task Decomposition — When Planning Adds Value</h2>
+  <p>
+    The PlannerAgent helps most on algorithmically complex problems where a structured plan prevents
+    obvious logical errors on the first attempt. For simple problems (e.g., HumanEval/2, /30, /22 — all
+    solved in 1 iteration), the planner adds tokens with no benefit. This suggests an
+    <strong>adaptive pipeline</strong> that skips planning below a complexity threshold would meaningfully
+    reduce cost.
+  </p>
+
+  <div class="callout danger">
+    <strong>Regression cases:</strong> HumanEval/99, /123, /138 were each solved by single-agent in one
+    shot but failed after 10 multi-agent iterations. The feedback loop made them worse, not better.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ TAB 4: DESIGN -->
+<div class="tab-panel" id="tab-design">
+
+  <h2>TesterAgent as a Deterministic Oracle</h2>
+  <p>
+    The TesterAgent runs <code>pytest</code> in a sandboxed <code>tempfile.mkdtemp()</code> subprocess
+    with <strong>no LLM calls</strong>. This makes test evaluation ground-truth accurate and reproducible,
+    unlike LLM-judged evaluation. Each problem runs in a fresh temporary directory, preventing import
+    cache contamination across problems.
+  </p>
+  <div class="callout info">
+    <strong>Tradeoff:</strong> deterministic accuracy, but the system cannot handle problems where the
+    test itself is ambiguous or partial credit is meaningful.
+  </div>
+
+  <h2>ReviewerAgent Keyword Protocol</h2>
+  <p>
+    The ReviewerAgent uses a binary keyword protocol: the string <code>APPROVED</code> in its response
+    triggers graph termination; anything else is treated as a bug list and passed back to CoderAgent.
+  </p>
+  <div class="callout warning">
+    <strong>Limitation:</strong> binary signal lacks nuance — the reviewer cannot express partial approval
+    or confidence levels, which can cause premature rejection of nearly-correct solutions.
+  </div>
+
+  <h2>Timeout Handling</h2>
+  <p>
+    A <code>subprocess.TimeoutExpired</code> handler was added to the TesterAgent after HumanEval/39
+    produced an infinite loop that crashed the entire benchmark run. Timeouts (30s limit) are now
+    captured as failed test results and returned as feedback to the CoderAgent, allowing the run to
+    continue on subsequent problems.
+  </p>
+
+  <h2>Feedback Loop Mechanics</h2>
+  <p>On each retry, CoderAgent receives all of the following signals simultaneously:</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Signal</th><th>Source</th><th>Content</th></tr></thead>
+      <tbody>
+        <tr><td>Problem description</td><td>Original input</td><td>Unchanged across iterations</td></tr>
+        <tr><td>Plan</td><td>PlannerAgent</td><td>Step-by-step implementation guide</td></tr>
+        <tr><td>Previous code</td><td>Prior iteration</td><td>The failing code to be revised</td></tr>
+        <tr><td>Test output</td><td>TesterAgent (pytest)</td><td>Exact failure messages and stack traces</td></tr>
+        <tr><td>Review</td><td>ReviewerAgent</td><td>Numbered bug list or APPROVED</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    When feedback signals are <strong>precise</strong> (pytest output), recovery is possible.
+    When they are <strong>vague or incorrect</strong> (reviewer hallucinations), the loop compounds errors.
+  </p>
+
+  <h2>Random Problem Sampling</h2>
+  <p>
+    Problems are randomly sampled from HumanEval on each run using <code>random.sample()</code>
+    (without replacement), ensuring no duplicates. If <code>--max-problems</code> equals the full
+    dataset size (164), all problems are returned in random order.
+  </p>
+</div>
+
+<!-- ══════════════════════════════════════════════ TAB 5: THEORY -->
+<div class="tab-panel" id="tab-theory">
+
+  <h2>Task Decomposition</h2>
+  <p>
+    The Planner → Coder → Tester → Reviewer chain implements <strong>hierarchical task decomposition</strong>:
+    a complex problem ("write a correct Python function") is broken into planning, implementation,
+    verification, and quality assurance sub-tasks, each handled by a specialized agent.
+  </p>
+  <div class="callout info">
+    The key insight from the results is that decomposition only adds value when the sub-tasks are
+    genuinely distinct in difficulty — otherwise it introduces overhead without benefit.
+  </div>
+
+  <h2>Feedback Loops</h2>
+  <p>
+    The Tester→Coder and Reviewer→Coder feedback loops implement <strong>closed-loop control</strong>:
+    the system measures actual output against desired output and corrects iteratively. This is analogous
+    to PID control in classical engineering.
+  </p>
+  <p>
+    The results confirm the theoretical prediction: the loop works when the error signal is
+    <strong>precise and actionable</strong> (pytest output), and fails when the corrective signal is
+    <strong>noisy or incorrect</strong> (reviewer hallucinations). Signal quality determines loop value.
+  </p>
+
+  <h2>Emergent Behavior</h2>
+  <p>
+    HumanEval/125 (7 iterations) and HumanEval/12 (8 iterations) demonstrate
+    <strong>emergent behavior</strong>: neither a single forward pass nor a single review would have
+    produced a correct solution, but the iterative agent interaction converged on one. The correct
+    solution emerged from the system as a whole, not from any individual agent.
+  </p>
+  <div class="callout success">
+    These cases are the strongest argument for multi-agent collaboration — outcomes that are
+    structurally impossible for a single-pass system.
+  </div>
+
+  <h2>When Multi-Agent Outperforms</h2>
+  <ul class="num-list">
+    <li><span class="num">1</span>The problem is complex enough that planning provides genuine decomposition value</li>
+    <li><span class="num">2</span>The first code attempt is nearly correct — a small, identifiable bug exists</li>
+    <li><span class="num">3</span>The feedback signal (test output) is precise and actionable enough for the coder to act on</li>
+  </ul>
+
+  <h2>When Multi-Agent Does Not Outperform</h2>
+  <ul class="num-list">
+    <li><span class="num">1</span>The problem is straightforward — single agent solves it in one shot (64% of cases)</li>
+    <li><span class="num">2</span>The underlying model lacks the capability to fix the identified bug regardless of iterations</li>
+    <li><span class="num">3</span>The planner or reviewer introduces incorrect guidance that misdirects the coder</li>
+  </ul>
+</div>
+
+<!-- ══════════════════════════════════════════════ TAB 6: CONCLUSIONS -->
+<div class="tab-panel" id="tab-conclusions">
+
+  <h2>Summary Findings</h2>
+  <div class="conclusion-grid">
+    <div class="conclusion-card amber">
+      <div class="c-title">Cost vs Accuracy</div>
+      <p>+1% solve rate at 31.4× token cost. Multi-agent is not cost-effective for gpt-3.5-turbo at this scale.</p>
+    </div>
+    <div class="conclusion-card green">
+      <div class="c-title">Loop Value Is Real</div>
+      <p>~6 problems recovered that single-agent failed. Value is narrow but genuine — limited to near-miss cases.</p>
+    </div>
+    <div class="conclusion-card red">
+      <div class="c-title">Expensive Failures</div>
+      <p>27/100 problems consumed full 10-iteration budget and still failed. Early stopping heuristics are needed.</p>
+    </div>
+    <div class="conclusion-card red">
+      <div class="c-title">Regression Risk</div>
+      <p>3 problems that single-agent solved became multi-agent failures. Planner/reviewer can degrade performance.</p>
+    </div>
+    <div class="conclusion-card">
+      <div class="c-title">First-Attempt Dominance</div>
+      <p>64% of multi-agent problems solved on iteration 1 — the feedback loop provides no value for the majority.</p>
+    </div>
+    <div class="conclusion-card green">
+      <div class="c-title">Emergent Behavior Confirmed</div>
+      <p>HumanEval/125 and /12 demonstrate outcomes impossible for single-pass systems — 7 and 8 iterations respectively.</p>
+    </div>
+  </div>
+
+  <h2>Full Findings Table</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Finding</th><th>Implication</th></tr></thead>
+      <tbody>
+        <tr><td>+1% solve rate at 31× token cost</td><td>Multi-agent not cost-effective for gpt-3.5-turbo</td></tr>
+        <tr><td>Feedback loop rescued ~6 problems</td><td>Value is real but narrow — near-miss cases only</td></tr>
+        <tr><td>27/100 hit max iterations and still failed</td><td>Expensive failure mode; early stopping needed</td></tr>
+        <tr><td>3 single-pass successes became failures</td><td>Planner/reviewer can degrade performance</td></tr>
+        <tr><td>64% solved in 1 iteration (multi)</td><td>Planning overhead wasted on most problems</td></tr>
+        <tr><td>Avg 3.7 vs 1.0 iterations</td><td>Most improvement in iterations 2–4; diminishing returns after</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Recommendations for Future Work</h2>
+  <ul class="num-list">
+    <li><span class="num">1</span><div><strong>Adaptive pipeline:</strong> skip PlannerAgent for low-complexity problems based on description length or keyword heuristics — reduces tokens without sacrificing quality</div></li>
+    <li><span class="num">2</span><div><strong>Early stopping:</strong> add confidence scoring from ReviewerAgent to exit before iteration 10 when recovery is unlikely</div></li>
+    <li><span class="num">3</span><div><strong>Stronger model:</strong> repeat experiment with <code>gpt-4o-mini</code>, <code>gpt-4o</code>, or <code>claude-sonnet</code> — the feedback loop likely shows greater benefit with higher model capability</div></li>
+    <li><span class="num">4</span><div><strong>Larger sample:</strong> full 164-problem run for statistical significance — current ±5% confidence interval is too wide for strong conclusions</div></li>
+    <li><span class="num">5</span><div><strong>Cost-weighted metric:</strong> report "tokens per solved problem" as the primary metric alongside solve rate to capture the accuracy–cost trade-off</div></li>
+  </ul>
+
+  <h2>Summary Statistics</h2>
+  <div class="comparison">
+    <div class="panel single">
+      <h4>Single-Agent — Summary</h4>
+      <div class="stat-row"><span class="key">Solve rate</span><span class="val">71 / 100 (71%)</span></div>
+      <div class="stat-row"><span class="key">Total tokens</span><span class="val">24,742</span></div>
+      <div class="stat-row"><span class="key">Tokens / problem</span><span class="val">247</span></div>
+      <div class="stat-row"><span class="key">Token range</span><span class="val">114 – 581</span></div>
+      <div class="stat-row"><span class="key">Iterations</span><span class="val">Always 1</span></div>
+    </div>
+    <div class="panel multi">
+      <h4>Multi-Agent — Summary</h4>
+      <div class="stat-row"><span class="key">Solve rate</span><span class="val">72 / 100 (72%)</span></div>
+      <div class="stat-row"><span class="key">Total tokens</span><span class="val">776,072</span></div>
+      <div class="stat-row"><span class="key">Tokens / problem</span><span class="val">7,760</span></div>
+      <div class="stat-row"><span class="key">Iteration range</span><span class="val">1 – 10</span></div>
+      <div class="stat-row"><span class="key">1-iter solves</span><span class="val">64 / 100 (64%)</span></div>
+      <div class="stat-row"><span class="key">Multi-iter rescues</span><span class="val">~6 problems</span></div>
+      <div class="stat-row"><span class="key">Max-iter failures</span><span class="val">27 / 100 (27%)</span></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Multi-Agent Software Engineering · Intelligent Agent Systems &amp; LLMs · 2025–2026
+</footer>
+
+<script>
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
+</script>
+</body>
+</html>
