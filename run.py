@@ -18,13 +18,13 @@ CONFIGS = {
         "output": "results/smoke.json",
     },
     "single": {
-        "max_problems": 164,
+        "max_problems": 100,
         "max_iterations": 10,
         "mode": "single",
         "output": "results/single.json",
     },
     "multi": {
-        "max_problems": 164,
+        "max_problems": 100,
         "max_iterations": 10,
         "mode": "multi",
         "output": "results/multi.json",
